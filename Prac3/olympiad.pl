@@ -67,22 +67,11 @@ symbolicOutput(0).
 
 satVariable( chosen(S) ):- student(S).   % chosen(S) means "student S has been chosen"
 
-% he definit el predicat mutuals per definir aquells que son amics mutus
-mutuals(S1,S2):- friends(S1,S2), friends(S2,S1).
 
 %%%%%%  2. Clause generation for the SAT solver:
 
-
-
-
-
-writeClauses:-
-      grups,                                   % els grups son de K estudiants
-      sonAmics,                                % each one of them considers all other team members a friend
-      diferentProblema,                        % all chosen students haver different expertise topics
-      true,!.
-writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
-
+% he definit el predicat mutuals per definir aquells que son amics mutus
+mutuals(S1,S2):- friends(S1,S2), friends(S2,S1).
 
 % Serveix per comprovar que tots els del grup siguin amics amb tots
 sonAmics:-  
@@ -96,8 +85,8 @@ sonAmics.
 % Serveix per formar els grups (a la linia 16 esta inicialitzat a 6).
 grups:- 
     numMembersTeam(K),                          % Grups de K persones
-    findall(chosen(I) , student(I), grup),      % Agafarà estudiants i els posara al grup
-    exactly(K,grup),                            % Grups de K persones
+    findall(chosen(I) , student(I), GRUP),      % Agafarà estudiants i els posara al grup
+    exactly(K,GRUP),                            % Grups de K persones
     fail.
 grups.
 
@@ -105,10 +94,22 @@ grups.
 diferentProblema:- 
     student(I), student(J), I \= J,             % L'estudiant no ha de ser ell mateix
                                                 % Si no experts amb el mateix problema ja ho tenim be :D
-    expertise(I,E), expertise(J,E),             % Son experts amb el mateix problema
+    expertise(I,E1), expertise(J,E2), E1 = E2,  % Son experts amb el mateix problema
     atMost(1, [chosen(I), chosen(J)]),
     fail.
 diferentProblema.
+
+
+
+
+writeClauses:-
+      grups,                                   % els grups son de K estudiants
+      sonAmics,                                % each one of them considers all other team members a friend
+      diferentProblema,                        % all chosen students haver different expertise topics
+      true,!.
+writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
+
+
 
 
 
