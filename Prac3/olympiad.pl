@@ -48,7 +48,7 @@ info(25,[1,3,8,10,13,18,20,21,24],t3).
 student(S):-     numStudents(N), between(1,N,S).
 friends(S1,S2):- student(S1), student(S2), info(S1,L,_), member(S2,L).
 expertise(S,E):- student(S), info(S,_,E).
-mutuals(S1,S2):- friends(S1,S2), friends(S2,S1).
+
 
 %%%%%%% =======================================================================================
 %
@@ -67,18 +67,49 @@ symbolicOutput(0).
 
 satVariable( chosen(S) ):- student(S).   % chosen(S) means "student S has been chosen"
 
+% he definit el predicat mutuals per definir aquells que son amics mutus
+mutuals(S1,S2):- friends(S1,S2), friends(S2,S1).
 
 %%%%%%  2. Clause generation for the SAT solver:
 
-% The goal is to form a team with exactly K students such that each one of them considers all other team members a friend
-% and all chosen students haver different expertise topics.
+
+
+
 
 writeClauses:-
-      sonamics,
-      diferentproblema.
-      
+      grups,                                   % els grups son de K estudiants
+      sonAmics,                                % each one of them considers all other team members a friend
+      diferentProblema,                        % all chosen students haver different expertise topics
       true,!.
 writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
+
+
+% Serveix per comprovar que tots els del grup siguin amics amb tots
+sonAmics:-  
+    student(I), student(J), I \= J,             % L'estudiant no pot ser amic amb ell mateix
+                                                % En cas que siguin mutuals no cal fer res :D     
+    not(mutuals(I,J)),                          % Que passara si no son amics mutus?
+    atMost(1, [chosen(I), chosen(J)]),              % - Que haurem de triar-ne un   
+    fail.
+sonAmics.
+
+% Serveix per formar els grups (a la linia 16 esta inicialitzat a 6).
+grups:- 
+    numMembersTeam(K),                          % Grups de K persones
+    findall(chosen(I) , student(I), grup),      % Agafarà estudiants i els posara al grup
+    exactly(K,grup),                            % Grups de K persones
+    fail.
+grups.
+
+% Serveix per comprovar que els estudiants siguin experts en problemes diferents
+diferentProblema:- 
+    student(I), student(J), I \= J,             % L'estudiant no ha de ser ell mateix
+                                                % Si no experts amb el mateix problema ja ho tenim be :D
+    expertise(I,E), expertise(J,E),             % Son experts amb el mateix problema
+    atMost(1, [chosen(I), chosen(J)]),
+    fail.
+diferentProblema.
+
 
 
 %%%%%%  3. DisplaySol: show the solution. Here M contains the literals that are true in the model:
