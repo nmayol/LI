@@ -87,7 +87,7 @@ road(16,17).
 
 %Helpful prolog predicates
 city(C):- numCities(N), between(1,N,C).
-
+%road(C1,C2):- .
 
 %%%%%%% =======================================================================================
 %
@@ -108,17 +108,36 @@ satVariable( install(C) ):- city(C). %   install(C) means  "a gas station is ins
 
 
 %%%%%%  2. Clause generation for the SAT solver:
+% It has been decided that if 
+% a road connects cities C1 and C2, a gas station should be placed in
+% C1, C2, or both.  The government budget limits the number of
+% stations that can be built (maxStations).
+% Complete the following program to do this.
+
+massaEstacions:-
+    findAll(install(I), city(I), IST),          % Mirem totes les benzineres instalades a una ciutat.
+    maxStations(N),                             % Definim la variable que ens dira si hi ha massa estacions
+    not(atMost(N,IST)),
+    fail.
+massaEstacions.
+
+posarBenzineres:-
+    
+    fail.
+posarBenzineres.
 
 writeClauses:- 
-    ...
+    posarBenzineres,
+    massaEstacions,
+    true, !.
 writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
 
 %%%%%%  3. DisplaySol: show the solution. Here M contains the literals that are true in the model:
 
 %displaySol(M):- nl, write(M), nl, nl, fail.
-displaySol(M):- 
-    ....
+%displaySol(M):- fail.
+    
 
 %%%%%%% =======================================================================================
 
