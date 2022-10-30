@@ -87,7 +87,7 @@ road(16,17).
 
 %Helpful prolog predicates
 city(C):- numCities(N), between(1,N,C).
-%road(C1,C2):- .
+
 
 %%%%%%% =======================================================================================
 %
@@ -114,21 +114,24 @@ satVariable( install(C) ):- city(C). %   install(C) means  "a gas station is ins
 % stations that can be built (maxStations).
 % Complete the following program to do this.
 
-massaEstacions:-
-    findAll(install(I), city(I), IST),          % Mirem totes les benzineres instalades a una ciutat.
-    maxStations(N),                             % Definim la variable que ens dira si hi ha massa estacions
-    not(atMost(N,IST)),
+comptaEstacions:-
+    maxStations(K),
+    findall(install(I), city(I), GRUP),
+    atMost(K,GRUP),
     fail.
-massaEstacions.
+comptaEstacions.
+
 
 posarBenzineres:-
-    
+    city(C2), city(C1),
+    road(C1,C2),
+    atLeast(1,[install(C1),install(C2)]),       % tria una de les dos ciutats per posarhi una benzinera.
     fail.
 posarBenzineres.
 
 writeClauses:- 
     posarBenzineres,
-    massaEstacions,
+    comptaEstacions,
     true, !.
 writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
@@ -136,7 +139,8 @@ writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
 %%%%%%  3. DisplaySol: show the solution. Here M contains the literals that are true in the model:
 
 %displaySol(M):- nl, write(M), nl, nl, fail.
-%displaySol(M):- fail.
+displaySol(M):- write('City: '), nl, city(C), member(install(C),M), write(C), write(' '), fail.
+displaySol(_):-nl.
     
 
 %%%%%%% =======================================================================================
