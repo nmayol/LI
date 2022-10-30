@@ -1,6 +1,6 @@
-
 % 1. Escribe un predicado prod(L,P) que signifique: "P es el producto de los elementos de la lista
 % de enteros dada L". Debe poder generar la P y tambien comprobar una P dada.
+
 prod([],1).
 prod([L1|List], P):- prod(List, P1), P is L1*P1.
 
@@ -45,6 +45,7 @@ reverse([],[]).
 reverse(L,Last|X):- ultim(L,Last),
     rm(Last,L,NewL), reverse(NewL,X). % predicat rm definit a exercici 4.
 
+
 % 5. Escribe un predicado fib(N,F) que significa que: \F es el N-esimo numero de Fibonacci para la
 % N dada". Estos numeros se definen asi: fib(1) = 1, fib(2) = 1, y si N > 2 entonces fib(N) =
 % fib(N - 1) + fib(N - 2).
@@ -72,4 +73,183 @@ dados(P,N,[X|L]):-
     P1 is P - X, N1 is N-1,
     dados(P1, N1, L).
 
+
+% 7. Escribe un predicado suma_demas(L) que, dada una lista de enteros L, se satisface si existe algun
+% elemento en L que es igual a la suma de los demas elementos de L, y falla en caso contrario.
+
+suma_demas([]).
+suma_demas(L):-
+    rm(X,L,NL), suma(NL,X).
+
+suma([],0).
+suma([Y|NL],R):-
+    suma(NL,R1), R is R1 + Y.
+
+
+% 8. Escribe un predicado suma ants(L) que, dada una lista de enteros L, se satisface si existe algun
+% elemento en L que es igual a la suma de los elementos anteriores a el en L, y falla en caso
+% contrario.
+
+suma_ants([]).
+suma_ants(L):-
+    append(L1,[X|L2],L), 
+    suma(L1,X).
+
+% 9. Escribe un predicado card(L) que, dada una lista de enteros L, escriba la lista que, para cada
+% elemento de L, dice cuantas veces aparece este elemento en L.
+
+% card(L):- ocurrence(L,R), write(R). 
+
+% ocurrence([],[]).
+% ocurrence(L,R):-
+%     append(L1, [X|L2], L),
+    
+
+% ocurrence(L2,R).
+
+% 10. Escribe un predicado esta ordenada(L) que signique: \la lista L de numeros enteros esta
+% ordenada de menor a mayor". Por ejemplo, a la consulta:
+
+esta_ordenada([]).
+esta_ordenada([_]).   
+esta_ordenada([L1,L2|L]):-
+    L1 < L2,
+    esta_ordenada([L2|L]).
+    
+% 11. Escribe un predicado ord(L1,L2) que signique: \L2 es la lista de enteros L1 ordenada de
+% menor a mayor". Por ejemplo: si L1 es [4,5,3,3,2] entonces L2 sera [2,3,3,4,5]. Hazlo en
+% una linea, usando solo los predicados permutacion y esta ordenada.
+
+ord(L1,L2):- permutation(L1,L2), esta_ordenada(L2).
+
+
+% 12. Escribe un predicado diccionario(A,N) que, dado un alfabeto A de simbolos y un natural N,
+% escriba todas las palabras de N simbolos, por orden alfabetico (el orden alfabetico es segun el
+% alfabeto A dado).
+
+diccionario(A,N):- perm(A,N,R), printP(R), write(', '), fail.
+
+perm(_,0,[]):- !.
+perm(A, N, [PA|R]):-
+    member(PA,A),
+    N1 is N-1,
+    perm(A, N1, R).
+
+printP([]).
+printP([Relem|R]):- write(Relem), printP(R). 
+
+
+% 13. Escribe un predicado palindromos(L) que, dada una lista de letras L, escriba todas las per-
+% mutaciones de sus elementos que sean palindromos (capicuas)
+
+pld([]).
+pld([_]).
+pld([L1|L]):-
+    ultim(L, Last),
+    L1 = Last,
+    rm(Last,L,NL),
+    pld(NL).
+
+palindromos(L):- permutation(L,R), pld(R), printP(R), write(', '), fail.
+
+% 14. Encuentra mediante un programa Prolog, usando el predicado permutacion, que 8 digitos difer-
+% entes tenemos que asignar a las letras S, E, N, D, M, O, R, Y, de manera que se cumpla la suma
+% siguiente:
+
+solve:-
+    LLETRES = [S, E, N, D, M, O, R, Y, _, _],
+    VALORS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    permutation(LLETRES,VALORS),
+    Suma is (1000 * S) + (100 * E) + (10 * N) + (D) +
+            (1000 * M) + (100 * O) + (10 * R) + (E),
+
+    Suma is (10000 * M) + (1000 * O) + (100 * N) + (10 * E) + (Y),
+    print(LLETRES).
+
+print([S, E, N, D, M, O, R, Y, _, _]):-
+    write('S = '), write(S), write(' / '),
+    write('E = '), write(E), write(' / '),
+    write('N = '), write(N), write(' / '),
+    write('D = '), write(D), write(' / '),
+    write('M = '), write(M), write(' / '),
+    write('O = '), write(O), write(' / '),
+    write('R = '), write(R), write(' / '),
+    write('Y = '), write(Y).
+
+% 15. Escribe un predicado simplifica que pueda usarse en combinacion con el programa de calcular
+% derivadas.
+
+der(X,X,1):- var(X), !. 
+% ! es fa servir per aturar la cerca de solucions
+
+der(C,_,0):-            % der(E,V,D)  ==  la derivada de E respecte de V és D 
+	number(C).
+der(A+B,X,U+V):- 
+	der(A,X,U), 
+	der(B,X,V). 
+der(A*B,X,A*V+B*U):- 
+	der(A,X,U), 
+	der(B,X,V). 
+
+
+% 16.
+
+% Codi donat de l'enunciat:
+
+p([],[]).
+p(L,[X|P]) :- select(X,L,R), p(R,P).
+
+% select esborra l'element X de L i posa el resultat a R.
+% a) p tindra una combinacio de les fitxes.
+
+dom(L) :- p(L,P), ok(P), write(P), nl.
+dom( ) :- write('no hay cadena'), nl.
+
+% b) Predicat ok.
+
+ok([_]):-!.
+ok([Y|P]):-
+    append([Y1],[Y2],Y),
+    append([E],P1,P),
+    append([E1],[E2],E),
+    E1 = Y2,
+    ok(P).
+
+% c) tornar a escriure p
+
+dom2(L) :- p2(L,P), ok(P), write(P), nl.
+dom2( ) :- write('no hay cadena'), nl.
+
+p2([],[]).
+p2(L,P):-p21(L,_,P).
+
+p21([],_,[]):-!.
+p21(L,Element,[X1|P]):-
+    select(X,L,R),
+    
+    permutation(X,X1),
+    append([Element1],[Element2],X1),
+    p21(R,Element2,P).
+
+
+% 20. Write in Prolog a predicate flatten(L,F) that flattens" (cast.: \aplana") the list F
+
+flatten([], []) :- !.
+
+flatten([L1|L], F) :- !,
+    flatten(L1, F1),
+    flatten(L, F2),
+    append(F1,F2,F).
+flatten(L1, [L1]).
+
+% 21. Escribe un predicado Prolog log(B,N,L) que calcula la parte entera L del logaritmo en base B
+% de N, donde B y N son naturales positivos dados. Por ejemplo, ?- log(2,1020,L). escribe L=9?
+% Podeis usar la exponenciacion, como en 125 is 5**3. El programa (completo) no debe ocupar
+% mas de 3 lineas.
+log(_,1,0).
+log(B, N, A1):-
+    N > 1,
+    N1 is N//B,
+    log(B, N1, A),
+    A1 is A + 1.
 
