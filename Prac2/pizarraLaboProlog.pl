@@ -97,23 +97,17 @@ suma_ants(L):-
 
 % 9. Escribe un predicado card(L) que, dada una lista de enteros L, escriba la lista que, para cada
 % elemento de L, dice cuantas veces aparece este elemento en L.
+ 
+pert_con_resto(X, L, R) :-
+	append(L1, [X|L2], L),
+    append(L1, L2, R).
 
-card(L):- ocur(L,M), write(M).
+car([],[]).
+car( [X|L] , [ [X,N1] |Cr] ):-car(L,C),pert_con_resto([X,N],C,Cr),!,N1 is N+1.
+car( [X|L] , [ [X,1]   |C] ):-car(L,C).
 
-ocur([],_):-!.
-ocur(L,M):-
+card(L):-car(L,C),write(C).
 
-    select(X,L,R),
-    count(L,X,RES),
-    ocur(R,[RES|M]).
-    
- count([],_,0).
- count([Y|L],X,C):-
-    X == Y,
-    write(L), write(' '), write(X), nl, 
-    count(L,X,C1),
-    C1 is C + 1,
-    write(C1), nl.
 
 % 10. Escribe un predicado esta ordenada(L) que signique: \la lista L de numeros enteros esta
 % ordenada de menor a mayor". Por ejemplo, a la consulta:
