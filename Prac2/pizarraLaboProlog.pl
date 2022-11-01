@@ -103,8 +103,11 @@ pert_con_resto(X, L, R) :-
     append(L1, L2, R).
 
 car([],[]).
-car( [X|L] , [ [X,N1] |Cr] ):-car(L,C),pert_con_resto([X,N],C,Cr),!,N1 is N+1.
-car( [X|L] , [ [X,1]   |C] ):-car(L,C).
+car([X|L],[[X,N1]|Cr]):-
+    car(L,C),
+    pert_con_resto([X,N],C,Cr), !,
+    N1 is N+1.
+car([X|L],[[X,1]|C]):-car(L,C).
 
 card(L):-car(L,C),write(C).
 
