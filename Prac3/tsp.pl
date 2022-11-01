@@ -60,9 +60,25 @@ satVariable( visited(I,P) ):-  city(I), position(P). % visited(I,P) meaning "cit
 
 
 %%%%%%  2. Clause generation for the SAT solver:
+construirCami:-
+    findall(not(visited(C1,P)) , city(C1), GRUP),
+    city(C2),
+    adjacency(C1,C2),
+    C1 \= 1,
+    fail.
+
+calculCost:-
+    maxCost(K), 
+    findall(visited(C1,P),city(C1),VIS1),
+    P1 is P+1,
+    findall(visited(C2,P1),city(C2),VIS2),
+    
+    fail.
 
 writeClauses:- 
-    ...
+    construirCami,
+    calculCost,
+    true, !.
 writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
 
