@@ -76,9 +76,9 @@ calculCost:-
     fail.
 
 writeClauses:- 
-    construirCami,
-    calculCost,
-    true, !.
+    % construirCami,
+    % calculCost,
+    % true, !.
 writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
 
