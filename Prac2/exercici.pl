@@ -231,6 +231,71 @@ p21(L,Element,[X1|P]):-
     append([Element1],[Element2],X1),
     p21(R,Element2,P).
 
+% 17. Complete the following backtracking procedure for SAT in Prolog. Program everything, except
+% the predicate readclauses(F), which reads a list of clauses, where each clause is a list of integers.
+% For example, p3 _ :p6 _ p2 is represented by [3,-6,2]. Do things as simple as possible.
+
+% decision_lit(F,Lit):-
+%     select(Lit,F,R).
+
+% p:- readclauses(F), sat([],F).
+% p:- write('UNSAT'),nl.
+% sat(I,[]):- write('IT IS SATISFIABLE. Model: '), write(I),nl,!.
+% sat(I,F):-
+%     decision_lit(F,Lit), % Select unit clause if any; otherwise, an arbitrary one.
+%     simplif(Lit,F,F1), % Simplifies F. Warning: may fail and cause backtracking
+%     sat(,).
+
+
+% 18. Consider two groups of 10 people each. In the first group, as expected, the percentage of people
+% with lung cancer among smokers is higher than among non-smokers. In the second group, the
+% same is the case. But if we consider the 20 people of the two groups together, then the situation
+% is the opposite: the proportion of people with lung cancer is higher among non-smokers than
+% among smokers! Can this be true? Write a little Prolog program to and it out.
+
+num(X):- between(1,7,X). % below, e.g. SNC1 denotes "num. smokers with no cancer group 1".
+
+p:- num(SC1), num(SNC1), num(NSC1), num(NSNC1), 10 is SC1+SNC1+NSC1+NSNC1,
+    SC1/(SC1+SNC1) > NSC1/(NSC1+NSNC1),
+    num(SC2), num(SNC2), num(NSC2), num(NSNC2), 10 is SC2+SNC2+NSC2+NSNC2,
+    SC2/(SC2+SNC2) > NSC2/(NSC2+NSNC2),
+    (SC1+SC2)/(SC1+SNC1+SC2+SNC2) < (NSC1+NSC2)/(NSC1+NSNC1+NSC2+NSNC2),
+write([ SC1,SNC1,NSC1,NSNC1,SC2,SNC2,NSC2,NSNC2]), nl, halt.
+
+
+
+% 19. Supongamos que tenemos una maquina que dispone de monedas de valores [X1,...Xn] y tiene
+% que devolver una cantidad C de cambio utilizando el minimo numero de monedas. Escribe un
+% programa Prolog maq(L,C,M) que, dada la lista de monedas L y la cantidad C, genere en M la
+% lista de monedas a devolver de cada tipo. Por ejemplo, si L es [1,2,5,13,17,35,157], y C es
+% 361, entonces una respuesta es [0,0,0,1,2,0,2] (5 monedas)
+
+suma_cost(_,0,[]).
+suma_cost([X|L],S,[Y|M]):-
+    Y >= 0,
+    S >= 0,
+    S1 is S - X*Y,
+    suma_cost(L,S1,M).
+    
+    
+lessThan(_,[]).
+lessThan(N,[I|M]):-
+    between(0,N,I),
+    N2 is N - I,
+    lessThan(N2,M).
+
+maq(L,C,M):-
+    length(L,SizeL), length(M,SizeL),
+    between(0,C,Min),
+    lessThan(Min,M),
+
+    suma_cost(L,C,M), !.
+
+
+
+
+
+
 
 % 20. Write in Prolog a predicate flatten(L,F) that flattens" (cast.: \aplana") the list F
 
