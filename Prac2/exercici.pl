@@ -98,14 +98,22 @@ suma_ants(L):-
 % 9. Escribe un predicado card(L) que, dada una lista de enteros L, escriba la lista que, para cada
 % elemento de L, dice cuantas veces aparece este elemento en L.
 
-% card(L):- ocurrence(L,R), write(R). 
+card(L):- ocur(L,M), write(M).
 
-% ocurrence([],[]).
-% ocurrence(L,R):-
-%     append(L1, [X|L2], L),
+ocur([],_):-!.
+ocur(L,M):-
+
+    select(X,L,R),
+    count(L,X,RES),
+    ocur(R,[RES|M]).
     
-
-% ocurrence(L2,R).
+ count([],_,0).
+ count([Y|L],X,C):-
+    X == Y,
+    write(L), write(' '), write(X), nl, 
+    count(L,X,C1),
+    C1 is C + 1,
+    write(C1), nl.
 
 % 10. Escribe un predicado esta ordenada(L) que signique: \la lista L de numeros enteros esta
 % ordenada de menor a mayor". Por ejemplo, a la consulta:
@@ -179,17 +187,36 @@ print([S, E, N, D, M, O, R, Y, _, _]):-
 % 15. Escribe un predicado simplifica que pueda usarse en combinacion con el programa de calcular
 % derivadas.
 
-der(X,X,1):- var(X), !. 
-% ! es fa servir per aturar la cerca de solucions
+der(X, X, 1):-!.
+der(C, _, 0) :- number(C).
+der(A+B, X, A1+B1) :- der(A, X, A1), der(B, X, B1).
+der(A-B, X, A1-B1) :- der(A, X, A1), der(B, X, B1).
+der(A*B, X, A*B1+B*A1) :- der(A, X, A1), der(B, X, B1).
+der(sin(A), X, cos(A)*B) :- der(A, X, B).
+der(cos(A), X, -sin(A)*B) :- der(A, X, B).
+der(e^A, X, B*e^A) :- der(A, X, B).
+der(ln(A), X, B*1/A) :- der(A, X, B).
 
-der(C,_,0):-            % der(E,V,D)  ==  la derivada de E respecte de V és D 
-	number(C).
-der(A+B,X,U+V):- 
-	der(A,X,U), 
-	der(B,X,V). 
-der(A*B,X,A*V+B*U):- 
-	der(A,X,U), 
-	der(B,X,V). 
+
+simplifica(E,E1):- unpaso(E,E2),!, simplifica(E2,E1).
+simplifica(E,E).
+
+unpaso(A+B,A+C):- unpaso(B,C),!.
+unpaso(B+A,C+A):- unpaso(B,C),!.
+unpaso(A*B,A*C):- unpaso(B,C),!.
+unpaso(B*A,C*A):- unpaso(B,C),!.
+unpaso(0*_,0):-!.
+unpaso(_*0,0):-!.
+unpaso(1*X,X):-!.
+unpaso(X*1,X):-!.
+unpaso(0+X,X):-!.
+unpaso(X+0,X):-!.
+unpaso(N1+N2,N3):- number(N1), number(N2), N3 is N1+N2,!.
+unpaso(N1*N2,N3):- number(N1), number(N2), N3 is N1*N2,!.
+unpaso(N1*X+N2*X,N3*X):- number(N1), number(N2), N3 is N1+N2,!.
+unpaso(N1*X+X*N2,N3*X):- number(N1), number(N2), N3 is N1+N2,!.
+unpaso(X*N1+N2*X,N3*X):- number(N1), number(N2), N3 is N1+N2,!.
+unpaso(X*N1+X*N2,N3*X):- number(N1), number(N2), N3 is N1+N2,!.
 
 
 % 16.
@@ -255,12 +282,14 @@ p21(L,Element,[X1|P]):-
 
 num(X):- between(1,7,X). % below, e.g. SNC1 denotes "num. smokers with no cancer group 1".
 
-p:- num(SC1), num(SNC1), num(NSC1), num(NSNC1), 10 is SC1+SNC1+NSC1+NSNC1,
-    SC1/(SC1+SNC1) > NSC1/(NSC1+NSNC1),
-    num(SC2), num(SNC2), num(NSC2), num(NSNC2), 10 is SC2+SNC2+NSC2+NSNC2,
-    SC2/(SC2+SNC2) > NSC2/(NSC2+NSNC2),
-    (SC1+SC2)/(SC1+SNC1+SC2+SNC2) < (NSC1+NSC2)/(NSC1+NSNC1+NSC2+NSNC2),
-write([ SC1,SNC1,NSC1,NSNC1,SC2,SNC2,NSC2,NSNC2]), nl, halt.
+p:- num(SC1), num(SNC1), num(NSC1), num(NSNC1),
+    10 is SC1+SNC1+NSC1+NSNC1,                                              % Defineix subgrups del grup 1 i comprova que sumin 10.
+    SC1/(SC1+SNC1) > NSC1/(NSC1+NSNC1),                                     % Hi ha mes cancer entre els fumadors (grup1)
+    num(SC2), num(SNC2), num(NSC2), num(NSNC2), 
+    10 is SC2+SNC2+NSC2+NSNC2,                                              % Defineix subgrups del grup 2 i comprova que sumin 10. 
+    SC2/(SC2+SNC2) > NSC2/(NSC2+NSNC2),                                     % Hi ha més prop de cancer entre els fumadors.
+    (SC1+SC2)/(SC1+SNC1+SC2+SNC2) < (NSC1+NSC2)/(NSC1+NSNC1+NSC2+NSNC2),    % Pero la proporcio de la suma es mes gran per la gent sense cancer
+write([ SC1,SNC1,NSC1,NSNC1,SC2,SNC2,NSC2,NSNC2]), nl, fail, !.
 
 
 
@@ -292,11 +321,6 @@ maq(L,C,M):-
     suma_cost(L,C,M), !.
 
 
-
-
-
-
-
 % 20. Write in Prolog a predicate flatten(L,F) that flattens" (cast.: \aplana") the list F
 
 flatten([], []) :- !.
@@ -311,10 +335,50 @@ flatten(L1, [L1]).
 % de N, donde B y N son naturales positivos dados. Por ejemplo, ?- log(2,1020,L). escribe L=9?
 % Podeis usar la exponenciacion, como en 125 is 5**3. El programa (completo) no debe ocupar
 % mas de 3 lineas.
+
 log(_,1,0).
 log(B, N, A1):-
     N > 1,
     N1 is N//B,
     log(B, N1, A),
     A1 is A + 1.
+
+% 22. Supongamos que N estudiantes (identificados por un numero entre 1 y N) se quieren matricular
+% de LI, pero solo hay espacio para M, con M < N. Ademas nos dan una lista L de pares de estos
+% estudiantes que son incompatibles entre si (por ejemplo, porque siempre se copian). Queremos
+% obtener un programa Prolog li(N,M,L,S) que, para N, M y L dados, genere un subconjunto S
+% con M de los N estudiantes tal que si [x; y] 2 L entonces fx; yg S.
+
+creaEstudiants(0,[]):-!.
+creaEstudiants(N,[N|Est]):-
+    N1 is N-1,
+    creaEstudiants(N1,Est).
+
+subcjto([],[]). 
+subcjto([_|C],S) :- subcjto(C,S). 
+subcjto([X|C],[X|S]) :- subcjto(C,S).
+
+comprova([],_):-!.
+comprova([X|L],S):-
+    % write(X),
+    not(incompatible(X, S)),
+    comprova(L,S).
+
+
+incompatible(Parella, S):-
+    append([P1], [P2], Parella),
+    %write(' P1 = '), write(P1), write(' P2 = '), write(P2), write(' '),
+    member(P2,S),
+    member(P1,S).
+
+
+li(N,M,L,S):-
+    creaEstudiants(N,Est),
+    subcjto(Est,C),
+    
+    length(C,Mida), M = Mida,
+    %write(C), nl,
+    comprova(L,C),
+    write(C), !.
+
 
