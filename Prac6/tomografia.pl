@@ -18,7 +18,7 @@
 %	 0                         
 %	
 
-:- use_module(library(clpq)).
+:- use_module(library(clpfd)).
 
 ejemplo1( [0,0,8,2,6,4,5,3,7,0,0], [0,0,7,1,6,3,4,5,2,7,0,0] ).
 ejemplo2( [10,4,8,5,6], [5,3,4,0,5,0,5,2,2,0,1,5,1] ).
@@ -50,15 +50,16 @@ wbit(0):- write('   '),!.
 
 declareConstraints([],[]).
 declareConstraints([Z|Y],[I|J]):-
-	suma(Z,I),
+	sum(Z,#=,I),
 declareConstraints(Y,J).
 
 
-suma([],0).
+suma(L,0).
 suma([A|X],B):-
+	write(A), write(' '), write(B), write(' '),
+	B #>= 0,
 	B1 is B - A,
-	B1 #>= 0,
-suma(X,B1).
+	suma(X,B1).
 
 
 matrixByRows([],_,[]).
