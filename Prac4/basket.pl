@@ -104,7 +104,6 @@ tvMatch:-
     round(R),
     findall(match(S,T,R),tvMatch(S,T),TV),
     atLeast(1,TV),
-    
 fail.
 
 writeClauses(MaxCost):-
