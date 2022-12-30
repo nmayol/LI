@@ -1,6 +1,6 @@
 :- use_module(library(clpfd)).
 
-%ejemplo(_, Big, [S1...SN]): how to fit all squares of sizes S1...SN in a square of size Big?
+% ejemplo(_, Big, [S1...SN]): how to fit all squares of sizes S1...SN in a square of size Big?
 ejemplo(0,  3,[2,1,1,1,1,1]).
 ejemplo(1,  4,[2,2,2,1,1,1,1]).
 ejemplo(2,  5,[3,2,2,2,1,1,1,1]).
@@ -37,13 +37,22 @@ ejemplo(6,175,[81,64,56,55,51,43,39,38,35,33,31,30,29,20,18,16,14,9,8,5,4,3,2,1]
 main:- 
     ejemplo(3,Big,Sides),
     nl, write('Fitting all squares of size '), write(Sides), write(' into big square of size '), write(Big), nl,nl,
-    length(Sides,N), 
+    length(Sides,N),
+   
     length(RowVars,N), % get list of N prolog vars: Row coordinates of each small square
-    ...
-    insideBigSquare(N,Big,Sides,RowVars),
-    insideBigSquare(N,Big,Sides,ColVars),
-    nonoverlapping(N,Sides,RowVars,ColVars),
-    ...
+    length(ColVars,N),
+    Big1 is Big-1,
+    RowVars ins 0..Big1,
+    ColVars ins 0..Big1,
+    write('Rows: '),
+    insideBigSquare(N,Big,Sides,RowVars), nl,
+    write('Cols: '),
+    insideBigSquare(N,Big,Sides,ColVars),nl,
+    write('mirem si es solapa: '), nl,
+    nonoverlapping(RowVars,ColVars,Sides), nl,
+    append(RowVars,ColVars,Vars),
+    labeling([],Vars),
+    write(Vars),
     displaySol(Big,Sides,RowVars,ColVars), halt.
 
 
@@ -54,6 +63,25 @@ displaySol(N,Sides,RowVars,ColVars):-
     nth1(K,ColVars,CV),    CVS is CV+S-1,     between(CV,CVS,Col),
     writeSide(S), fail.
 displaySol(_,_,_,_):- nl,nl,!.
+
+insideBigSquare(0,_,[],[]).
+insideBigSquare(N,B,[S|Si],[R|RV]):-
+    Max is B - S,
+    R #=< Max,
+    % Sum #= R + S, Sum #>= 0, Sum #< B, N1 is N-1,
+    % write(R),write(' '),write(S),write(' '),write(Sum),write(' '),
+insideBigSquare(N1,B,Si,RV).
+
+nonoverlapping([R|Row],[C|Col],[S|Sides]):-
+    noOverLap(R,Row,C,Col,S,Sides),
+    nonoverlapping(Row,Col,Sides).
+nonoverlapping([],[],[]).
+    
+noOverLap(R,[R1|Rows],C,[C1|Cols],S,[S1|Sides]):-
+    R+S #=< R1 #\/ C+S #=< C1 #\/ R1+S1 #=< R #\/ C1+S1 #=< C,
+    noOverLap(R,Rows,C,Cols,S,Sides).
+noOverLap(_,[],_,[],_,[]).
+
 
 writeSide(S):- S<10, write('  '),write(S),!.
 writeSide(S):-       write(' ' ),write(S),!.
