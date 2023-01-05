@@ -24,20 +24,20 @@
 numTeams(14).               % This number is always even.
 noDoubles([2,8,13]).        % No team has a double on any of these rounds.
 tvTeams([1,2,3,4,5,6]).     % The list of tv teams.
-notHome( 1, [  2,    5,  7,      9,10          ]).  % Team 1 cannot play at home on round 2, also not on round 5, etc.
-notHome( 2, [      4,      6,  8,  10          ]).
-notHome( 3, [  2,3,  5,  7,      9,10          ]).
-notHome( 4, [4,        6,  8,             12   ]).
-notHome( 5, [1,  3,                       12   ]).
-notHome( 6, [1,  3,  5,  7,         10         ]).
-notHome( 7, [1,  3,  5,  7,       9            ]).
-notHome( 8, [1,  3,  5,  7,       9            ]).
-notHome( 9, [1,    4,           8,  10         ]).
-notHome(10, [  2,  4,           8,9,   11      ]).
-notHome(11, [  2,  4,      8,             12   ]).
-notHome(12, [           6                      ]).
-notHome(13, [           6,          10,11,   13]).
-notHome(14, [  2,  4                           ]).
+notHome( 1, [2,5,7,9,10]).  % Team 1 cannot play at home on round 2, also not on round 5, etc.
+notHome( 2, [4,6,8,10]).
+notHome( 3, [2,3,5,7,9,10]).
+notHome( 4, [4,6,8,12]).
+notHome( 5, [1,3,12]).
+notHome( 6, [1,3,5,7,10]).
+notHome( 7, [1,3,5,7,9]).
+notHome( 8, [1,3,5,7,9]).
+notHome( 9, [1,4,8,10]).
+notHome(10, [2,4,8,9,11]).
+notHome(11, [2,4,8,12]).
+notHome(12, [6]).
+notHome(13, [6,10,11,13]).
+notHome(14, [2,4]).
 
 
 %%%%%% Some helpful definitions to make the code cleaner:
@@ -69,56 +69,47 @@ symbolicOutput(0).
 satVariable( match(S,T,R) ):- team(S), team(T), round(R).   %  "on round R there is a match S-T at home of S"
 satVariable( home(S,R)    ):- team(S),          round(R).   %  "team S plays at home on round R"
 satVariable( double(S,R)  ):- team(S),          round(R).   %  "team S has a double on round R"
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 2. This predicate writeClauses(MaxCost) generates the clauses that guarantee that
 %    a solution with cost at most MaxCost is found
-
-% each team has exactly one match (home or away).
-% Moreover, we say that a team has a "double" on round R if it plays
-% at home on rounds R-1 and on round R, or if it plays away on R-1 and on R.
-% No "triples" are allowed: no three consecutive homes, nor three aways.
-% Minimize the number of doubles of the team with the largest number of doubles.
-
-% Additional constraints (see the input example below):
-%  1. No doubles on certain  (nodoubles)
-%  2. Movistar has bought the tv rights for Sunday 8pm for all
-%     matches among a group of teams (the so-called tv Teams) and wants
-%     on every round at least one match between two tv Teams.
-%  3. On certain rounds certain teams cannot play at home.
-
-
-noDobles:-
-    round(R), R \= 1, member(R,noDoubles),
-    team(S), write(S),
-    R1 is R-1, team(Q),
-    exactly(1,{home(S,R),home(S,R1)}),
-fail.
-
-noHome:-
-    team(T), team(S), round(R),
-    findall(match(S,T,R),round(R),Fora),
-    away(S,R),
-fail.
-
-tvMatch:-
-    round(R),
-    findall(match(S,T,R),tvMatch(S,T),TV),
-    atLeast(1,TV),
-fail.
-
 writeClauses(MaxCost):-
     eachTeamEachRoundExactlyOneMatch,
-    noDobles,
-    %noHome,
-    %tvMatch, % em sembla que ja esta be
+    eachMatchExactlyOneRound,
+    noacasa,
+    nodobles,
+    tvmatches,
     maxCost(MaxCost),
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
-eachTeamEachRoundExactlyOneMatch:- team(T), round(R),
-    findall( match(S,T,R), difTeams(S,T), LitsH ),
+eachMatchExactlyOneRound:-
+    team(S),team(T), S \= T,
+    findall( match(S,T,R), round(R), LitsH ),      % mira els enfrontaments d'un equip en una ronda i comprova que nomes n'hi hagi un
+    findall( match(T,S,R), round(R), LitsA ), append(LitsH,LitsA,Lits), exactly(1,Lits), fail.
+eachMatchExactlyOneRound.
+
+noacasa:-
+    findall(match(S,T,R),away(T,R),Lits),
+    findall(match(S,T,R),away(S,R),Lits),
+    writeClause([-home(T,R),-home(S,R)]),
+    fail.
+noacasa.
+
+tvmatches:-
+    round(R),  findall(match(S,T,R),tvMatch(S,T),Lits),  writeClause(Lits), fail.
+tvmatches.
+
+nodobles:-
+    noDoubles(L), member(R,L), team(S), writeClause([ -double(S,R) ]), fail.
+nodobles.
+
+eachTeamEachRoundExactlyOneMatch:- team(T), round(R),   % per cada equip i cada ronda
+    findall( match(S,T,R), difTeams(S,T), LitsH ),      % mira els enfrontaments d'un equip en una ronda i comprova que nomes n'hi hagi un
     findall( match(T,S,R), difTeams(S,T), LitsA ), append(LitsH,LitsA,Lits), exactly(1,Lits), fail.
 eachTeamEachRoundExactlyOneMatch.
+
 
 maxCost(infinite):-!.
 maxCost(Max):- team(T), findall(double(T,R), round(R), Lits ), atMost(Max,Lits), fail.

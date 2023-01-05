@@ -27,12 +27,13 @@ maxHour(168).
 %%%%%% Some helpful definitions to make the code cleaner:
 
 task(T):-              task(T,_,_).
+hour(H):-              maxHour(X), between(0,X,H).
 duration(T,D):-        task(T,D,_).
 usesResource(T,R):-    task(T,_,L), member(R,L).
 
 %%%%%%
 
-symbolicOutput(0).  % set to 1 to see symbolic output only; 0 otherwise.
+symbolicOutput(1).  % set to 1 to see symbolic output only; 0 otherwise.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1.- Declare SAT variables to be used
@@ -47,10 +48,23 @@ satVariable( start(T,H) ):- task(T), integer(H).   % "task T starts at hour H"  
 writeClauses(infinite):- !, maxHour(M), writeClauses(M),!.
 writeClauses(MaxHours):-
     eachTaskStartsOnce(MaxHours),
-    ...
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
+eachTaskStartsOnce(MaxHours):-
+    hour(H),
+    findall(start(T,H),task(T),Lits),
+    exactly(1,Lits).
+eachTaskStartsOnce(0).
+
+resourcesused:-
+    task(T),
+    usesResource(T,R),
+    
+    % resourceUnits(),
+    % atMost(),
+    fail.
+resourcesused.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 3. This predicate displays a given solution M:
