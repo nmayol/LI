@@ -30,9 +30,6 @@ task(T):-              task(T,_,_).
 duration(T,D):-        task(T,D,_).
 usesResource(T,R):-    task(T,_,L), member(R,L).
 
-lastHour(Time, Duration,LastHour):-    LastHour is Time - Duration + 1.
-endHour(InitHour,Duration,EndHour):-   EndHour is InitHour + Duration - 1.
-
 %%%%%%
 
 symbolicOutput(0).  % set to 1 to see symbolic output only; 0 otherwise.
@@ -50,7 +47,6 @@ satVariable( possibleHours(T,PH) ):- task(T), integer(PH).
 
 writeClauses(infinite):- !, maxHour(M), writeClauses(M),!.
 writeClauses(MaxHours):-
-    initClauseGeneration,
     eachTaskStartsOnce(MaxHours),
     writeHours(MaxHours),
     resourcesNeeded(MaxHours),
@@ -64,7 +60,6 @@ writeHours(MaxHours):-
     between(1,MaximumHour,Init),
     MinimumHour is Init + D - 1,
     between(Init, MinimumHour, PH),
-    write(PH),
     writeClause([start(T,Init), possibleHours(T,PH)]),
     fail.
 writeHours(_).
@@ -81,7 +76,7 @@ eachTaskStartsOnce(_).
 resourcesNeeded(MaxHours):-
     resourceUnits(R,Units), % per cada recurs extreune les seves unitats
     between(1,MaxHours,H),
-    findall(possibleHours(T,PH),(task(T,_,TR),member(R,TR)),Over),
+    findall(possibleHours(T,H),(task(T,_,TR),member(R,TR)),Over),
     atMost(Units,Over), fail.
 resourcesNeeded(_).
 
