@@ -18,7 +18,8 @@ unPaso(8,   [1 ,A2,A5,1 ,1], [0 ,A2,A5,0 ,0]).  % va 1 i 8
 
 unPaso(5,   [A1,1 ,1 ,A8,1], [A1,0 ,0 ,A8,0]).  % va 2 i 5
 unPaso(8,   [A1,1 ,A5,1 ,1], [A1,0 ,A5,0 ,0]).  % va 2 i 8
-unPaso(8,   [A1,A2,1 ,1 ,1], [A1,A2,0 ,0 ,0]).  % va 2 i 8
+
+unPaso(8,   [A1,A2,1 ,1 ,1], [A1,A2,0 ,0 ,0]).  % va 5 i 8
 
 % Estructura estat: 1 marca si la persona [1|2|5|8] es a l'origen, l'ultima posicio marca si la llanterna es a l'origen.
 main :- EstadoInicial = [1,1,1,1,1], EstadoFinal = [0,0,0,0,0],
