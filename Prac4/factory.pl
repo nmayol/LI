@@ -27,17 +27,20 @@ maxHour(168).
 %%%%%% Some helpful definitions to make the code cleaner:
 
 task(T):-              task(T,_,_).
-hour(H):-              maxHour(X), between(0,X,H).
 duration(T,D):-        task(T,D,_).
 usesResource(T,R):-    task(T,_,L), member(R,L).
 
+lastHour(Time, Duration,LastHour):-    LastHour is Time - Duration + 1.
+endHour(InitHour,Duration,EndHour):-   EndHour is InitHour + Duration - 1.
+
 %%%%%%
 
-symbolicOutput(1).  % set to 1 to see symbolic output only; 0 otherwise.
+symbolicOutput(0).  % set to 1 to see symbolic output only; 0 otherwise.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1.- Declare SAT variables to be used
 satVariable( start(T,H) ):- task(T), integer(H).   % "task T starts at hour H"     (MANDATORY)
+satVariable( possibleHours(T,PH) ):- task(T), integer(PH).
 % more variables will be needed.... See displaySol!
 
 
@@ -47,24 +50,41 @@ satVariable( start(T,H) ):- task(T), integer(H).   % "task T starts at hour H"  
 
 writeClauses(infinite):- !, maxHour(M), writeClauses(M),!.
 writeClauses(MaxHours):-
+    initClauseGeneration,
     eachTaskStartsOnce(MaxHours),
+    writeHours(MaxHours),
+    resourcesNeeded(MaxHours),
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
-eachTaskStartsOnce(MaxHours):-
-    hour(H),
-    findall(start(T,H),task(T),Lits),
-    exactly(1,Lits).
-eachTaskStartsOnce(0).
-
-resourcesused:-
+writeHours(MaxHours):-
     task(T),
-    usesResource(T,R),
-    
-    % resourceUnits(),
-    % atMost(),
+    duration(T,D), % agafem la duracio  de la tasca
+    MaximumHour is MaxHours + 1 - D, % agafem l'hora maxima que pot comencar la tasca
+    between(1,MaximumHour,Init),
+    MinimumHour is Init + D - 1,
+    between(Init, MinimumHour, PH),
+    write(PH),
+    writeClause([start(T,Init), possibleHours(T,PH)]),
     fail.
-resourcesused.
+writeHours(_).
+
+eachTaskStartsOnce(MaxHours):-
+    task(T),
+    duration(T,D), % agafem la duracio  de la tasca
+    MaximumHour is MaxHours + 1 - D, % agafem l'hora maxima que pot comencar la tasca
+    findall(start(T,Hour),between(1,MaximumHour,Hour),Lits), % agafem les vegades que comença la tasca entre 1 i la hora maxima
+    exactly(1,Lits),    % nomes ha de comencar una vegada
+    fail.
+eachTaskStartsOnce(_).
+
+resourcesNeeded(MaxHours):-
+    resourceUnits(R,Units), % per cada recurs extreune les seves unitats
+    between(1,MaxHours,H),
+    findall(possibleHours(T,PH),(task(T,_,TR),member(R,TR)),Over),
+    atMost(Units,Over), fail.
+resourcesNeeded(_).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 3. This predicate displays a given solution M:
