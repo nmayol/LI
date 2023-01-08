@@ -62,7 +62,7 @@ away(T,R):- notHome(T,L), member(R,L).
 %%%%%%% =======================================================================================
 
 
-symbolicOutput(0).
+symbolicOutput(1).
 
 %%%%%% It is mandatory to use these variables!
 % 1.- Declare SAT variables to be used
@@ -78,11 +78,19 @@ writeClauses(MaxCost):-
     eachTeamEachRoundExactlyOneMatch,
     eachMatchExactlyOneRound,
     noacasa,
+    finddobles,
     nodobles,
     tvmatches,
     maxCost(MaxCost),
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
+
+finddobles:-
+    team(T),
+    findall(double(T,R),round(R),Lits),
+    writeClause(Lits),
+    fail.
+finddobles.
 
 eachMatchExactlyOneRound:-
     team(S),team(T), S \= T,
@@ -91,10 +99,10 @@ eachMatchExactlyOneRound:-
 eachMatchExactlyOneRound.
 
 noacasa:-
-    findall(match(S,T,R),away(T,R),Lits),
-    findall(match(S,T,R),away(S,R),Lits),
-    writeClause([-home(T,R),-home(S,R)]),
-    fail.
+    round(R),
+    team(T),
+    away(T,R),
+    writeClause([-home(T,R)]),fail.
 noacasa.
 
 tvmatches:-
@@ -102,7 +110,11 @@ tvmatches:-
 tvmatches.
 
 nodobles:-
-    noDoubles(L), member(R,L), team(S), writeClause([ -double(S,R) ]), fail.
+    noDoubles(L),
+    member(R,L),
+    team(S),
+    writeClause([ -double(S,R) ]),
+    fail.
 nodobles.
 
 eachTeamEachRoundExactlyOneMatch:- team(T), round(R),   % per cada equip i cada ronda
