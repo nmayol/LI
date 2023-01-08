@@ -23,14 +23,13 @@ tsp( [], AccumulatedKm, RouteSoFar ):- storeRouteIfBetter(AccumulatedKm,RouteSoF
 %tsp(  _, AccumulatedKm, _          ):- bestRouteSoFar(Km,_), AccumulatedKm >= Km, !, fail.
 %alternative:
 tsp( Cities, AccumulatedKm, _ ):- bestRouteSoFar(Km,_),
-    current_prolog_flag(max_integer, LBound),
     lowerBoundOfRemainingCities( Cities, LBound ),   %implement this (efficiently)!
     AccumulatedKm+LBound >= Km, !, fail.
 
 %3
 tsp( Cities, AccumulatedKm, [ CurrentCity | RouteSoFar ] ):-
-    select( City, Cities, RemainingCities ),  % select next city to visit
-    %myselect( CurrentCity, City, Cities, RemainingCities ),  % implement this
+    %select( City, Cities, RemainingCities ),  % select next city to visit
+   	myselect(City, Cities, RemainingCities, CurrentCity),
     distance( CurrentCity, City, Km ),  AccumulatedKm1 is AccumulatedKm+Km,
     tsp( RemainingCities, AccumulatedKm1, [ City, CurrentCity | RouteSoFar ] ).
 
@@ -90,52 +89,51 @@ row(X,Dists):-
 	[  71,146, 46, 40, 40,148, 67, 98,112, 33, 91, 52, 95,161,113,170,139,106, 85,  0, 85, 20],
 	[ 154,205, 61, 51,123,227, 19,136,189, 99, 19,137,172,214,166,206,183,190,154, 85,  0, 98],
 	[  55,153, 66, 49, 24,146, 79,113,111, 48,102, 39, 95,169,124,183,151,100, 91, 20, 98,  0]],
-    nth1(A,M,Dists),!.
+    nth1(X,M,Dists),!.
 
 
 %bestRouteSoFar(BestKm,[]):- BestKm is 0,!.
 %bestRouteSoFar(BestKm,[A|R]):- bestRouteSoFar(BestKm,R), append(B,R1,R), distance(A,B,Km), BestKm is BestKm + Km.
 
-lowerBoundOfRemainingCities([],_).
+lowerBoundOfRemainingCities([],0).
 lowerBoundOfRemainingCities( [C|Cities], LBound ):-
-    row(C,Dists),
-    list_min(Dists,LBound,LBound1),
-    Result2 is min(LBound,LBound1), lowerBoundOfRemainingCities(Cities,Result2).
+lowerBoundOfRemainingCities(Cities,LBound1),
+	closestCity(C,C1),
+	distance(C,C1,X),
+	LBound is min(LBound1,X).
 
+closestCity(1,20).
+closestCity(2,18).
+closestCity(3,42).
+closestCity(4,40).
+closestCity(5,17).
+closestCity(6,38).
+closestCity(7,26).
+closestCity(8,47).
+closestCity(9,17).
+closestCity(10,33).
+closestCity(11,19).
+closestCity(12,17).
+closestCity(13,17).
+closestCity(14,35).
+closestCity(15,28).
+closestCity(16,34).
+closestCity(17,28).
+closestCity(18,35).
+closestCity(19,28).
+closestCity(20,20).
+closestCity(21,19).
+closestCity(22,20).
 
+myselect(City, Cities, RemainingCities, CurrentCity) :- getDistances(CurrentCity, Cities, Distances), sort(Distances, D), member(I, D), distance(CurrentCity, City, I), select(City, Cities, RemainingCities).
 
-% City-C te una distancia superior al limit
-lowerBound(Min,C,[City|Cities]):-
-    distance(C,City,Km),
-    Min1 is min(Min, Km),
-    %write(Min), nl,
-lowerBound(Min,C,Cities).
+getDistances(CurrentCity, [City], [Distance]) :- distance(City, CurrentCity, Distance), !.
+getDistances(CurrentCity, [City|Cities], [Distance|Distances]) :- getDistances(CurrentCity, Cities, Distances), distance(City, CurrentCity, Distance).
 
+getDistances(CurrentCity, Cities, D):- row(CurrentCity,Dists), getValues(Cities,Dists,D).
 
-
-list_min([L|Ls], Min) :-
-    list_min(Ls, L, Min).
-
-list_min([], Min, Min).
-list_min([L|Ls], Min0, Min) :-
-    Min1 is min(L, Min0),
-    list_min(Ls, Min1, Min).
-    
-
-myselect(0,0,Cities,RemainingCities):-
-    append(RemainingCities,Cities,RemainingCities),!.
-
-myselect(CurrentCity,City,[C|Cities],RemainingCities):-
-    City = C,
-    City is 0,
-myselect(CurrentCity, City, Cities, RemainingCities).
-
-myselect(CurrentCity,City,[C|Cities],RemainingCities):-
-    CurrentCity = C,
-    CurrentCity is 0,
-myselect(CurrentCity, City, Cities, RemainingCities).
-
-myselect(CurrentCity, City, [C|Cities], RemainingCities):-
-    append(C,RemainingCities,RemainingCities),
-myselect(CurrentCity, City, [C|Cities], RemainingCities).
-
+getValues([],_,D):-!.
+getValues([C|Cities],Dists,D):-
+	nth1(C,Dists,X),
+	append(X,D,D1),
+	getValues(Cities, Dists, D1).
