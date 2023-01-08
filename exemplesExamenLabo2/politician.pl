@@ -21,7 +21,7 @@ road( 5-8, 22 ).
 road( 6-8, 11 ).
 road( 7-8, 44 ).
 
-road1(A-B,K):- road(B-A,K).
+road1(A-B,K):- road(A-B,K).
 road1(B-A,K):- road(A-B,K).
 
 
@@ -29,21 +29,19 @@ road1(B-A,K):- road(A-B,K).
 politician(N,MaxKm,Trip):- path(N, MaxKm, 1, [], Trip).
 % path( NumCitiesRemainingToBeVisited, RemainingKm, CurrentCity, CitiesAlreadyVisited, Path )
 
-path( 0, _, 1, _, []):-!.
+path( 0, RemainingKm, 1, _, []):- RemainingKm >= 0,!.
 path( NumCitiesRemainingToBeVisited, RemainingKm, CurrentCity, CitiesAlreadyVisited, [CurrentCity1|Path] ):-
     %write(CurrentCity), write('-'), write(CurrentCity1),write(' '),
     road1( CurrentCity-CurrentCity1, K ),
-    currentCity1NoVisited(CurrentCity1, CitiesAlreadyVisited),
-    noSuperaMaxKM(RemainingKm, K),
+    
+    not(member(CurrentCity1, CitiesAlreadyVisited)),
     RemainingKm1 is RemainingKm - K,
     N1 is NumCitiesRemainingToBeVisited - 1,
     path(N1,RemainingKm1,CurrentCity1,[CurrentCity1|CitiesAlreadyVisited], Path).
 
 
     
-noSuperaMaxKM(RemainingKm, K):- RemainingKm >= K.
 
-currentCity1NoVisited(CurrentCity1, CitiesAlreadyVisited):- not(member(CurrentCity1, CitiesAlreadyVisited)).
 
 %% Examples: this main writes the six trips below (in some order):
 
