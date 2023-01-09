@@ -114,13 +114,13 @@ writeClauses(MaxNumProf):-
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
 
-eachCourseExactlyOneProf:- course(C), findall( cp(C,P), (professor(P), courseProfessors(C,LP), member(P,LP)), Lits ), exactly(1,Lits), fail.
+eachCourseExactlyOneProf:- courseProfessors(C,LP), findall( cp(C,P), member(P,LP), Lits ), exactly(1,Lits), fail.
 eachCourseExactlyOneProf.
 
-eachCourseExactlyOneRoom:- course(C), findall(cr(C,R),(room(R),courseRooms(C,LP),member(R,LP)),L), exactly(1,L), fail.
+eachCourseExactlyOneRoom:- courseRooms(C,R), findall(cr(C,R1), member(R1,R), Lits), exactly(1,Lits), fail.
 eachCourseExactlyOneRoom.
 
-eachCourseMaxOncePerDay:- course(C), day(P), findall( cd(C,P), hour(H), Lits ), atMost(1,Lits), fail.
+eachCourseMaxOncePerDay:- course(C),day(D), findall(cdh(C,D,H),hour(H), Lits), atMost(1,Lits), fail.
 eachCourseMaxOncePerDay.
 
 relateVarsCDHwithCD:- % course day hour with course day
@@ -138,9 +138,12 @@ eachCourseRightNumberOfDays:-
 eachCourseRightNumberOfDays.
 
 noOverlapCoursesSameYear:- 
-    day(D), hour(H),
-    findall(cdh(C,D,H),(year(Y),courseYear(C,Y)), Lits),
-    atMost(1,Lits),
+    course(C),
+    courseYear(C,Y),
+    course(C1),
+    courseYear(C1,Y),
+    C < C1,
+    writeClause([-cdh(C,D,H),-cdh(C1,D,H)]),
     fail.
 noOverlapCoursesSameYear.
 
