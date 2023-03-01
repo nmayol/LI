@@ -1,0 +1,142 @@
+
+------------------
+vars-100-1.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-10.cnf
+KisSAT:
+0 s
+original:
+UNSATISFIABLE
+2 s
+
+------------------
+vars-100-2.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-3.cnf
+KisSAT:
+0 s
+original:
+UNSATISFIABLE
+8 s
+
+------------------
+vars-100-4.cnf
+KisSAT:
+0 s
+original:
+UNSATISFIABLE
+7 s
+
+------------------
+vars-100-5.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+2 s
+
+------------------
+vars-100-6.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-7.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+1 s
+
+------------------
+vars-100-8.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+5 s
+
+------------------
+vars-100-9.cnf
+KisSAT:
+0 s
+original:
+UNSATISFIABLE
+2 s
+
+------------------
+vars-150-1.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+80 s
+
+------------------
+vars-150-10.cnf
+KisSAT:
+0 s
+original:
+UNSATISFIABLE
+339 s
+
+------------------
+vars-150-2.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+305 s
+
+------------------
+vars-150-3.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+218 s
+
+------------------
+vars-150-4.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+176 s
+
+------------------
+vars-150-5.cnf
+KisSAT:
+0 s
+original:
+UNSATISFIABLE
+136 s
+
+------------------
+vars-150-6.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+12 s
+
+------------------
+vars-150-7.cnf
+KisSAT:
+0 s
+original:

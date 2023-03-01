@@ -266,9 +266,9 @@ p21(L,Element,[X1|P]):-
 % p:- write('UNSAT'),nl.
 % sat(I,[]):- write('IT IS SATISFIABLE. Model: '), write(I),nl,!.
 % sat(I,F):-
-%     decision_lit(F,Lit), % Select unit clause if any; otherwise, an arbitrary one.
-%     simplif(Lit,F,F1), % Simplifies F. Warning: may fail and cause backtracking
-%     sat(,).
+%    decision_lit(F,Lit), % Select unit clause if any; otherwise, an arbitrary one.
+%    simplif(Lit,F,F1), % Simplifies F. Warning: may fail and cause backtracking
+%    sat(,).
 
 
 % 18. Consider two groups of 10 people each. In the first group, as expected, the percentage of people
