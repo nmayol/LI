@@ -99,7 +99,6 @@ suma_ants(L):-
 % para cada elemento de L, dice cuantas veces aparece este elemento en L. Por ejemplo,
 % si hacemos la consulta card( [1,2,1,5,1,3,3,7] ) el interprete escribira:
 %     [[1,3],[2,1],[5,1],[3,2],[7,1]].
-
 card(L):- cards(L,Res), write(Res).
 
 cards([],[]).
@@ -131,7 +130,6 @@ esta_ordenada([X,Y|L]):-
 % Escribe un predicado ord(L1,L2) que signifique: “L2 es la lista de enteros L1 ordenada
 % de menor a mayor”. Por ejemplo: si L1 es [4,5,3,3,2] entonces L2 seria [2,3,3,4,5]. Hazlo
 % en una linea, usando solo los predicados permutacion y esta ordenada.
-
 ord(L1,L2):- permutation(L1,L2), esta_ordenada(L2).
 
 
@@ -140,5 +138,99 @@ ord(L1,L2):- permutation(L1,L2), esta_ordenada(L2).
 % escriba todas las palabras de N simbolos, por orden alfabetico (el orden alfabetico es segun
 % el alfabeto A dado). Por ejemplo, diccionario( [ga,chu,le],2) escribiria:
 %     gaga gachu gale chuga chuchu chule lega lechu lele.
-diccionario(A,N):-
-    subset()
+
+%%%%%%%% EXERCICI 13 %%%%%%%%
+% Escribe un predicado palindromos(L) que, dada una lista de letras L, escriba todas las 
+% permutaciones de sus elementos que sean palindromos (capicuas). Por ejemplo, con la consulta
+% palindromos([a,a,c,c]) se escribe [a,c,c,a] y [c,a,a,c].
+
+palindromos(L):- palindrom(L,X), write(X), fail.
+
+palindrom([],[]).
+palindrom([X],[X]).
+
+% paraules de mida parell
+palindrom(L,L1):-
+    length(L,Size), N is Size // 2,
+
+    permutation(L,L1),
+    append(L11,L12,L1),
+    
+    length(L11,N), length(L12,N),
+    inverseList(L12,L12R),
+    L11 = L12R.
+
+% paraules de mida senar
+palindrom(L,L1):-
+    length(L,Size), N is Size // 2,
+
+    permutation(L,L1),
+    append(L11,[Middle|L12],L1),
+     
+    length(L11,N), length(L12,N),
+    inverseList(L12,L12R),
+    L11 = L12R.
+
+%%%%%%%% EXERCICI 14 %%%%%%%%
+% Encuentra mediante un programa Prolog, usando el predicado permutacion, que
+% 8 dıgitos diferentes tenemos que asignar a las letras S, E, N, D, M, O, R, Y,
+% de manera que se cumpla la suma siguiente:
+%
+%       S   E   N   D
+%   +   M   O   R   E
+%  --------------------
+%   M   O   N   E   Y  
+%
+
+result:- sendMoreMoney([S, E, N, D, M, O, R, Y]),
+    write('S = '), write(S), nl,
+    write('E = '), write(E), nl,
+    write('N = '), write(N), nl,
+    write('D = '), write(D), nl,
+    write('M = '), write(M), nl,
+    write('O = '), write(O), nl,
+    write('R = '), write(R), nl,
+    write('Y = '), write(Y), nl,
+    !.
+
+sendMoreMoney([S, E, N, D, M, O, R, Y]):-
+    Digits = [0,1,2,3,4,5,6,7,8,9],
+    Res = [S, E, N, D, M, O, R, Y, _, _],
+    permutation(Digits,Res),
+
+    Money is Y + 10*E + 100*N + 1000*O + 10000*M,
+    Send is D + 10*N + 100*E + 1000*S,
+    More is E + 10*R + 100*O + 1000*M,
+
+    SendMore is Send + More,
+    SendMore = Money.
+
+
+
+%%%%%%%% EXERCICI 16 %%%%%%%%
+% Queremos obtener en Prolog un predicado dom(L) que, dada una lista L de fichas de
+% domino (en el formato de abajo), escriba una cadena de domino usando todas las 
+% fichas de L, o escriba “no hay cadena” si no es posible. Por ejemplo, 
+%     ?- dom( [ f(3,4), f(2,3), f(1,6), f(2,2), f(4,2), f(2,1) ] ).
+% escribe la cadena correcta:
+%     [ f(2,3), f(3,4), f(4,2), f(2,2), f(2,1), f(1,6) ].
+% Tambien podemos girar alguna ficha como f(N,M), reemplazandola por f(M,N). Asi, para:
+%     ?- dom ([ f(4,3), f(2,3), f(1,6), f(2,2), f(2,4), f(2,1) ]).
+% solo hay cadena si se gira alguna ficha (por ejemplo, hay la misma cadena que antes).
+% El siguiente programa Prolog aun no tiene en cuenta los posibles giros de fichas, ni
+% tiene implementado el predicado ok(P), que significa: "P es una cadena de domino
+% correcta (tal cual, sin necesidad ya de girar ninguna ficha)":
+
+p([],[]).
+p(L,[X|P]) :- select(X,L,R), p(R,P).
+
+dom(L) :- p(L,P), 
+    ok(P),
+    write(P),
+    nl.
+dom(_) :- write('no hay cadena'), nl.
+
+% (a) ¿Que significa el predicado p(L,P) para una lista L dada? La deixa absolutament igual
+% (b) Escribe el predicado ok(P) que falta.
+
+
