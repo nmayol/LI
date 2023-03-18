@@ -224,13 +224,280 @@ sendMoreMoney([S, E, N, D, M, O, R, Y]):-
 p([],[]).
 p(L,[X|P]) :- select(X,L,R), p(R,P).
 
-dom(L) :- p(L,P), 
+dom(L):-
+    p(L,P), 
     ok(P),
     write(P),
     nl.
 dom(_) :- write('no hay cadena'), nl.
 
-% (a) ¿Que significa el predicado p(L,P) para una lista L dada? La deixa absolutament igual
+% (a) ¿Que significa el predicado p(L,P) para una lista L dada? En treu una permutació
 % (b) Escribe el predicado ok(P) que falta.
 
+ok([X,Y|P]):-
+    
+    X = f(X1,X2),
+    Y = f(Y1,Y2),
+    
+    X2 = Y1,
+    %write('f('), write(X1), write(','), write(X2), write(') // '),write('f('), write(Y1), write(','), write(Y2), write(')'), nl,
+    append([Y],P,P2),
+    
+    ok(P2).
+    
+ok([_]):-!,nl.
 
+% Extiende el predicado p para que el programa tambien pueda hacer cadenas girando alguna
+% de las fichas de la entrada.
+
+p2([],[]).
+p2(L,[X|P]) :- select(X,L,R), p2(R,P).
+
+%%%%%%%% EXERCICI 19 %%%%%%%%
+% Supongamos que tenemos una maquina que dispone de monedas de valores [X1,...Xn] y tiene
+% que devolver una cantidad C de cambio utilizando el minimo numero de monedas. Escribe un
+% programa Prolog maq(L,C,M) que, dada la lista de monedas L y la cantidad C, genere en M la
+% lista de monedas a devolver de cada tipo. Por ejemplo, si L es [1,2,5,13,17,35,157], y C es
+% 361, entonces una respuesta es [0,0,0,1,2,0,2] (5 monedas).
+
+
+
+%%%%%%%% EXERCICI 20 %%%%%%%%
+% Write in Prolog a predicate flatten(L,F) that “flattens” (cast.: "aplana") the list F as in the
+% example:
+
+flatten([],[]):-!.
+flatten([X|M],F):- !,
+    % write(X), write('///'), write(M), nl,
+    flatten(M,F2),
+    flatten(X,F1),
+    append(F1,F2,F).
+flatten(X,[X]).
+
+%%%%%%%% EXERCICI 21 %%%%%%%%
+% Escribe un predicado Prolog log(B,N,L) que calcula la parte entera L del logaritmo en base B
+% de N, donde B y N son naturales positivos dados. Por ejemplo, ?- log(2,1020,L). escribe L=9?
+% Podeis usar la exponenciacion, como en 125 is 5**3. El programa (completo) no debe ocupar
+% mas de 3 lineas.
+
+log(_,1,L):- L is 0.
+log(B,N,L):-
+    N1 is N // B,
+    log(B,N1,L1),
+    L is L1 + 1.
+    
+%%%%%%%% EXERCICI 22 %%%%%%%%
+% Supongamos que N estudiantes (identificados por un numero entre 1 y N) se quieren matricular de LI,
+% pero solo hay espacio para M, con M < N. Ademas nos dan una lista L de pares de estos
+% estudiantes que son incompatibles entre si (por ejemplo, porque siempre se copian).
+
+subcjt([], []).
+subcjt([E|Tail], [E|NTail]):-
+    subcjt(Tail, NTail).
+subcjt([_|Tail], NTail):-
+    subcjt(Tail, NTail).
+
+generarLlista(0,[]).
+generarLlista(N,[N|L]):-
+    N1 is N - 1,
+    generarLlista(N1,L).
+
+
+li(N,M,L,S):-
+   generarLlista(N,Estudiants),
+   subcjt(Estudiants,S),
+   length(S,M),
+   noIncompatibles(S,L),!.
+
+noIncompatibles(_,[]):-!.
+noIncompatibles(S,[X|L]):-
+    %write(S), write(' '), write(L), nl,
+    intersection(S,X,Intersection),
+    length(Intersection, Size),
+    Size =< 1,
+    noIncompatibles(S, L).
+
+
+
+%%%%%%%% EXERCICI 23 %%%%%%%%
+%% Given a list of integers L, and a maximum sum K, 
+%% write the subsets Sm of L such that:
+%%  * sum(Sm) =< K, and
+%%  * no element in L \ Sm can be added to Sm without exceeding the sum K.
+
+% For the example below, a correct output would be the following
+% (or in another order):
+%% [2,5,-2,1]
+%% [2,-2,2,3,1]
+%% [2,-2,2,4]
+%% [2,-2,4,1]
+%% [5,-2,2,1]
+%% [5,-2,3]
+%% [7,-2,1]
+%% [-2,2,4,1]
+%% [-2,3,4,1]
+
+%% Hint: you can use the predicate sum_list(L, X),
+%% which is true if X is the sum of the numbers in L;
+%% e.g., sum_list([1,2,3], 6) holds.
+
+%% ===============================
+%% Example
+%% ===============================
+
+numbers([2,5,7,-2,2,9,3,4,1]).
+maxSum(6).
+
+%% subsetWithRest(L, Subset, Rest) holds
+%% if Subset is a subset of L and Rest is the rest of the elements.
+
+subcjt([], []).
+subcjt([E|Tail], [E|NTail]):-
+    subcjt(Tail, NTail).
+subcjt([_|Tail], NTail):-
+    subcjt(Tail, NTail).
+
+
+findRest(Subset,L,R):-
+    length(L,NL), length(Subset,NS), 
+    subcjt(L,R),
+    append(Subset,R,L2),
+    permutation(L2,L),
+    %write(Subset), write(' '), write(R), write(' ') ,write(L2), nl,
+    !.
+
+subsetWithRest(L,Subset,R):-
+    subcjt(L,Subset),
+    findRest(Subset,L,R).
+    % write(Subset), write(' '), write(R), write(' ') , nl,
+    
+
+sumList([],0).
+sumList([X|L],S):-
+    sumList(L,S1),
+    S is S1 + X.
+
+%% maxSubset(K, L, Sm) holds
+%% if Sm is a subset of numbers of L such that
+%% it sums at most K
+%% and if we try to add any other element, the sum exceeds K.
+maxSubset(K, L, Sm):-
+    subsetWithRest(L, Sm, Rest),
+   
+    sumList(Sm,SUM),
+    K >= SUM,
+    addElement(Rest,SUM,K),
+    write(Sm), write(' '), 
+    % write(Rest), write(' '),
+    nl,
+    fail,!.
+
+
+addElement([],_,_):-!.
+addElement([X|R],SUM,K):-
+    K < SUM + X,
+    addElement(R,SUM,K).
+
+
+%%%%%%%% EXERCICI 24 %%%%%%%%
+% Given a graph declared as in the example below, write all its cliques of size at least minCliqueSize.
+% Remember, a clique is a complete subgraph: a subset S of the vertices such that for all U,V in S there
+% is an edge U-V. For the example below, a correct output would be the following (or in another order):
+
+%%==== Example: ========================================================
+numVertices(10).
+minCliqueSize(4).
+vertices(Vs):- numVertices(N), findall(I,between(1,N,I),Vs).
+
+vertex(V):- vertices(Vs), member(V,Vs).
+edge(U,V):- edge1(U,V).
+edge(U,V):- edge1(V,U).
+edge1(9,8).
+edge1(8,2).
+edge1(7,4).
+edge1(5,7).
+edge1(4,2).
+edge1(5,2).
+edge1(2,7).
+edge1(7,9).
+edge1(2,9).
+edge1(4,8).
+edge1(4,9).
+edge1(9,5).
+edge1(4,5).
+%%==========================================================
+main:- vertices(Vs), subcjt( Vs, S), minCliqueSize(N), length(S,NS), N =< NS, isClique(S), write(S), nl, fail.
+main:- halt.
+
+isClique([]).
+isClique([V|S]):-
+    vertex(V),
+    hasEdge(V,S),
+    isClique(S),!.
+
+hasEdge(V,[]).
+hasEdge(V,[X|S]):-
+    edge(X,V),
+    hasEdge(V,S),!.
+
+
+
+%%%%%%%% EXERCICI 25 %%%%%%%%
+% nthRoot( N, K, R ) === "Given positive integers N and K, the integer part of the Nth root of K is R".
+% Example: the integer part of the 2th root (square root) of 16 is 4.
+% Example: the integer part of 
+% the 3rd root (cubic root) of 8 is 2.
+% Example: the integer part of the 4th root of 16 is 2.
+
+% Example: the integer part of the 4th root of 15 is 1.
+
+nthRoot( N, K, R ):-
+   findAll(I,between(0,K,I),Candidates),
+   valid(N,K,Candidates,R).
+
+
+
+valid(N,K,[X|C],X):-
+   calculate(X,N,Exp),
+   Exp =< K,
+   not(valid(N,K,C,X)),!.
+
+calculate(_,0,1).
+calculate(I,N,P):-
+    N1 is N - 1,
+    calculate(I,N1,P1),
+    P is P1 * I.
+
+%%%%%%%% EXERCICI 26 %%%%%%%%
+% Complete the following predicate in prolog.
+
+% allSSSS(L) (allSquareSummingSubSequences) === 
+% "Given a sequence of positive integers L, write all non-empty 
+% subsequences of L whose sum is a perfect square, in the following format":
+% ?- allSSSS([6,3,4,5,6,9,8,5,2,3,4]).
+% 9-[6,3]
+% 49-[3,4,5,6,9,8,5,2,3,4]
+% 4-[4]
+% 9-[4,5]
+% 9-[9]
+% 9-[2,3,4]
+% 4-[4]
+
+isPerfectSquare(N):-
+    S is floor(sqrt(N)),
+    % write(S), write(' '),
+    X is S * S,
+    % write(X), write(' '),
+    N = X, !.
+    %write('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'),
+    %nl.
+    
+
+allSSSS(L):-
+    subcjt(L,SS),
+    sum_list(SS,Sum),
+    %nl,
+    % write(SS), write(' '), write(Sum), write(': '),
+    isPerfectSquare(Sum), 
+    % nl, nl, nl,
+    write(Sum-SS),nl, fail.
