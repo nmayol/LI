@@ -1,0 +1,208 @@
+
+------------------
+vars-100-1.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                              703                1.40 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-10.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             1062                1.37 per conflict
+0 s
+misat:
+UNSATISFIABLE
+0 s
+
+------------------
+vars-100-2.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                               48                1.66 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-3.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             1130                1.14 per conflict
+1 s
+misat:
+UNSATISFIABLE
+0 s
+
+------------------
+vars-100-4.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             1096                1.25 per conflict
+0 s
+misat:
+UNSATISFIABLE
+0 s
+
+------------------
+vars-100-5.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                              460                1.20 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-6.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             1034                1.76 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-7.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                              188                1.28 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-8.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                              333                1.22 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-100-9.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                              696                1.14 per conflict
+1 s
+misat:
+UNSATISFIABLE
+0 s
+
+------------------
+vars-150-1.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                              960                1.45 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-150-10.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             7101                1.45 per conflict
+1 s
+misat:
+UNSATISFIABLE
+0 s
+
+------------------
+vars-150-2.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             5690                1.19 per conflict
+1 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-150-3.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             5230                1.59 per conflict
+0 s
+misat:
+SATISFIABLE
+1 s
+
+------------------
+vars-150-4.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             2062                1.25 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-150-5.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             5870                1.51 per conflict
+1 s
+misat:
+UNSATISFIABLE
+0 s
+
+------------------
+vars-150-6.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             1775                1.29 per conflict
+0 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-150-7.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             4578                1.18 per conflict
+1 s
+misat:
+UNSATISFIABLE
+0 s
+
+------------------
+vars-150-8.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             4790                1.38 per conflict
+1 s
+misat:
+SATISFIABLE
+0 s
+
+------------------
+vars-150-9.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             5121                1.23 per conflict
+0 s
+misat:
+SATISFIABLE
+1 s
+
+------------------
+vars-200-1.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                            28692                1.49 per conflict
+1 s
+misat:

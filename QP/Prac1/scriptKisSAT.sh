@@ -14,15 +14,15 @@ show_elapsed_time() {
   echo "$((end-start)) s"
 }
 
-#for f in vars-100*.cnf
 for f in vars*.cnf
+#for f in vars-300*.cnf
 do
     echo
     echo "------------------"
     echo $f
     echo "KisSAT:"
     start_measuring_time
-    # kissat -v $f > outKisSAT
+    ./kissat -v $f > outKisSAT
     stop_measuring_time
     egrep -o "UNSATISFIABLE|SATISFIABLE" outKisSAT
     egrep "decisions" outKisSAT

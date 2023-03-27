@@ -12,11 +12,21 @@ uint numVars;
 uint numClauses;
 vector<vector<int> > clauses;
 vector<vector<int> > occurlist;
+          //lit,    freq conflict
+vector<pair<int,pair<int,int>>> freq;
+vector<int> conflict_count;
 vector<int> model;
 vector<int> modelStack;
 uint indexOfNextLitToPropagate;
 uint decisionLevel;
 
+bool sortFreqConflict(const pair<int,pair<int,int>> &a, const pair<int,pair<int,int>> &b) {
+  return (a.second.first > b.second.first);
+}
+
+bool sortLit(const pair<int,pair<int,int>> &a, const pair<int,pair<int,int>> &b) {
+  return (a.first < b.second.first);
+}
 
 void readClauses( ){
   // Skip comments
@@ -29,16 +39,29 @@ void readClauses( ){
   string aux;
   cin >> aux >> numVars >> numClauses;
   clauses.resize(numClauses);
+  conflict_count.resize(numVars+1);
   occurlist.resize(numVars+1); 
+  //freq.resize(numVars+1); 
+  
+  freq = vector<pair<int, pair<int,int>>> (numVars+1, std::make_pair(0, std::make_pair(0,0)));
   // Read clauses
   for (uint i = 0; i < numClauses; ++i) {
     int lit;
     while (cin >> lit and lit != 0) {
         clauses[i].push_back(lit);
-        if (lit > 0) occurlist[lit].push_back(i);
-        else occurlist[-lit].push_back(i);
+        if (lit > 0) {
+          occurlist[lit].push_back(i);
+          ++freq[lit].second.first;
+          freq[lit].first = lit;
+        } 
+        else {
+          occurlist[-lit].push_back(i);
+          ++freq[-lit].second.first;
+          freq[-lit].first = -lit;
+        }
         
     }
+    
   }
   /*
   for (uint i = 1; i < numVars; ++i) {
@@ -47,6 +70,11 @@ void readClauses( ){
     cout << endl;
   }
   */
+  
+  sort(freq.begin(), freq.end(), sortFreqConflict);
+  // for (int i = 0; i < freq.size(); ++i) {
+  //    cout << freq[i].first << ' ' << freq[i].second << endl;
+  // }
 }
 
 
@@ -68,28 +96,32 @@ void setLiteralToTrue(int lit){
 
 bool propagateGivesConflict ( ) {
   while ( indexOfNextLitToPropagate < modelStack.size() ) {
-    //for (int i = 0; i < modelStack.size(); ++i )  cout << modelStack[indexOfNextLitToPropagate] << ' ';
-    //cout << endl;
-    
+      
     ////////// MEU //////////
     int x = modelStack[indexOfNextLitToPropagate];
-    
     if (x < 0) x = -x;
-    // for (uint j = 0; j < occurlist[x].size(); ++j) cout << occurlist[x][j] << ' ';
-    // cout << endl;
     for (uint i = 0; i < occurlist[x].size(); ++i) {
         bool someLitTrue = false;             // de moment no podem dir que la clausula sigui certa
         int numUndefs = 0;                    // UNDEF = variables amb valors sense assignar
         int lastLitUndef = 0;                 // valor de l'ultim literal sense cap valor assignat
         for (uint k = 0; not someLitTrue and k < clauses[occurlist[x][i]].size(); ++k){ // anem recorrent totes les clausules on apareix el literal
             int val = currentValueInModel(clauses[occurlist[x][i]][k]);   // 
-            if (val == TRUE) {
-                someLitTrue = true;
-
-            }
+            if (val == TRUE) { someLitTrue = true; }
             else if (val == UNDEF){ ++numUndefs; lastLitUndef = clauses[occurlist[x][i]][k]; }
         }
-        if (not someLitTrue and numUndefs == 0) return true; // conflict! all lits false
+        if (not someLitTrue and numUndefs == 0) {
+          for(uint j = 0; j < clauses[occurlist[x][i]].size(); ++j) {
+            int y = clauses[occurlist[x][i]][j];
+            // cout << y << ' ';
+            
+            if (y < 0) y = -y;
+            //sort(freq.begin(), freq.end(), sortLit);
+            //++freq[y].second.second;
+            //sort(freq.begin(), freq.end(), sortFreqConflict);
+          }
+          // cout << endl;
+          return true; // conflict! all lits false
+        }
         else if (not someLitTrue and numUndefs == 1) setLiteralToTrue(lastLitUndef);	
 
     }
@@ -135,11 +167,16 @@ void backtrack(){
 
 
 // Heuristic for finding the next decision literal:
-// Agafant el que té més ocurrencies ???
+// Agafant el UNDEF que té més ocurrencies ???
 int getNextDecisionLiteral(){
-  for (uint i = 1; i <= numVars; ++i) // stupid heuristic:
-    if (model[i] == UNDEF) return i;  // returns first UNDEF var, positively
-  return 0; // reurns 0 when all literals are defined
+  
+  bool found = false;
+  int x = 0;
+  for (uint i = 1; not found and i <= freq.size(); ++i) {
+    found = (model[freq[i].first] == UNDEF);
+    if (found) x = freq[i].first;
+  }
+  return x; // returns 0 when all literals are defined
 }
 
 void checkmodel(){

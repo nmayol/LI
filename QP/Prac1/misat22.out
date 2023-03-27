@@ -1,0 +1,384 @@
+
+------------------
+vars-100-1.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                              703                1.40 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:20 -92 -67 
+0 s
+
+------------------
+vars-100-10.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             1062                1.37 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:-42 64 7 
+0 s
+
+------------------
+vars-100-2.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                               48                1.66 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:-5 -72 10 
+0 s
+
+------------------
+vars-100-3.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             1130                1.14 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:42 -53 -54 
+0 s
+
+------------------
+vars-100-4.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:77 33 -47 
+0 s
+
+------------------
+vars-100-5.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                              460                1.20 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:-13 63 -41 
+0 s
+
+------------------
+vars-100-6.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             1034                1.76 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:-49 93 -84 
+0 s
+
+------------------
+vars-100-7.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:35 -74 -78 
+0 s
+
+------------------
+vars-100-8.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                              333                1.22 per conflict
+1 s
+misat:
+Error in model, clause is not satisfied:70 53 -71 
+0 s
+
+------------------
+vars-100-9.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                              696                1.14 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:7 -84 -15 
+0 s
+
+------------------
+vars-150-1.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:-39 -37 -66 
+0 s
+
+------------------
+vars-150-10.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:-72 -146 -52 
+0 s
+
+------------------
+vars-150-2.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+1 s
+misat:
+Error in model, clause is not satisfied:-93 8 56 
+0 s
+
+------------------
+vars-150-3.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:71 53 121 
+0 s
+
+------------------
+vars-150-4.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             2062                1.25 per conflict
+1 s
+misat:
+Error in model, clause is not satisfied:50 98 36 
+0 s
+
+------------------
+vars-150-5.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             5870                1.51 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:-29 69 102 
+0 s
+
+------------------
+vars-150-6.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:7 39 91 
+0 s
+
+------------------
+vars-150-7.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                             4578                1.18 per conflict
+0 s
+misat:
+Error in model, clause is not satisfied:-136 -9 6 
+1 s
+
+------------------
+vars-150-8.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:-40 130 71 
+0 s
+
+------------------
+vars-150-9.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:-93 -25 -61 
+0 s
+
+------------------
+vars-200-1.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+1 s
+misat:
+Error in model, clause is not satisfied:-160 -168 -126 
+0 s
+
+------------------
+vars-200-10.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+2 s
+misat:
+Error in model, clause is not satisfied:-106 -113 108 
+0 s
+
+------------------
+vars-200-2.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:-31 -128 -112 
+0 s
+
+------------------
+vars-200-3.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+1 s
+misat:
+Error in model, clause is not satisfied:102 88 98 
+0 s
+
+------------------
+vars-200-4.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+1 s
+misat:
+Error in model, clause is not satisfied:-75 -150 86 
+0 s
+
+------------------
+vars-200-5.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:-146 9 73 
+0 s
+
+------------------
+vars-200-6.cnf
+KisSAT:
+SATISFIABLE
+c decisions:                             4457                1.23 per conflict
+1 s
+misat:
+Error in model, clause is not satisfied:118 -170 -159 
+0 s
+
+------------------
+vars-200-7.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+1 s
+misat:
+Error in model, clause is not satisfied:191 132 -147 
+0 s
+
+------------------
+vars-200-8.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+1 s
+misat:
+Error in model, clause is not satisfied:-161 -91 33 
+0 s
+
+------------------
+vars-200-9.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:133 151 19 
+0 s
+
+------------------
+vars-250-1.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+7 s
+misat:
+Error in model, clause is not satisfied:188 -72 -111 
+0 s
+
+------------------
+vars-250-10.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:-119 3 87 
+0 s
+
+------------------
+vars-250-2.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+7 s
+misat:
+Error in model, clause is not satisfied:-27 -147 -93 
+0 s
+
+------------------
+vars-250-3.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+1 s
+misat:
+Error in model, clause is not satisfied:242 -98 202 
+0 s
+
+------------------
+vars-250-4.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+0 s
+misat:
+Error in model, clause is not satisfied:-80 -173 185 
+0 s
+
+------------------
+vars-250-5.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                           180763                1.51 per conflict
+5 s
+misat:
+Error in model, clause is not satisfied:46 124 169 
+0 s
+
+------------------
+vars-250-6.cnf
+KisSAT:
+UNSATISFIABLE
+c decisions:                           305605                1.63 per conflict
+8 s
+misat:
+Error in model, clause is not satisfied:-10 200 -152 
+0 s
+
+------------------
+vars-250-7.cnf
+KisSAT:
+Binary file outKisSAT matches
+Binary file outKisSAT matches
+2 s
+misat:
+Error in model, clause is not satisfied:226 26 -11 
+0 s
+
+------------------
+vars-250-8.cnf
+KisSAT:

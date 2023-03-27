@@ -140,3 +140,27 @@ vars-150-7.cnf
 KisSAT:
 0 s
 original:
+UNSATISFIABLE
+366 s
+
+------------------
+vars-150-8.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+76 s
+
+------------------
+vars-150-9.cnf
+KisSAT:
+0 s
+original:
+SATISFIABLE
+107 s
+
+------------------
+vars-200-1.cnf
+KisSAT:
+0 s
+original:
