@@ -55,7 +55,7 @@ moderator(M):-         numModerators(N), between(1,N,M).
 satVariable( ed(E,D) ):-  event(E), day(D).   %% Complete this!
 satVariable( em(E,M) ):-  event(E), moderator(M).
 satVariable( md(M,D) ):-  moderator(M), day(D).
-satVariable( emd(E,M,D) ):-  event(E), moderator(M), day(D).
+% satVariable( emd(E,M,D) ):-  event(E), moderator(M), day(D).
 
 %%%%%%%  2. Clause generation for the SAT solver: =============================================
 
@@ -67,34 +67,46 @@ adecuateEventsDay:-
     fail.
 adecuateEventsDay.
 
-eachEventJustOneDay:-
+eachEventJustOneDay:- % i el dia es un dia dels que pot
     event(E),
     findall(ed(E,D),(eventDays(E,Ds),member(D,Ds)),Lits),
     exactly(1,Lits),fail.
 eachEventJustOneDay.
 
-eachEventJustOneModerator:-
+eachEventJustOneModerator:- % i el moderador es un de permes
     event(E),
     findall(em(E,M),(eventModerators(E,Ms),member(M,Ms)),Lits),
     exactly(1,Lits),fail.
 eachEventJustOneModerator.
 
-eachModeratorAdecuateEvents:-
+relateDWithEDandEM:-
+    event(E),
+    eventDays(E,Ds),
+    member(D,Ds),
+    eventModerators(E,Ms),
+    member(M,Ms),
+    writeOneClause([-ed(E,D),-em(E,M),md(M,D)]),
+    fail.
+relateDWithEDandEM.
+
+
+
+eachModeratorAdecuateDays:-
     maxDaysPerModerator(N),
     moderator(M),
-    event(E), eventModerators(E, Ms), member(M,Ms),
-    day(D), eventDays(D,Ds), member(D,Ds),
-    findall(ed(E,D),(eventModerators(E,Ms),member(M,Ms),eventDays(E,Ds),member(D,Ds)),Lits),
+    findall(md(M,D),day(D),Lits),
     atMost(N,Lits),
     fail.
-eachModeratorAdecuateEvents.
+eachModeratorAdecuateDays.
+
 
 
 writeClauses:-
     adecuateEventsDay,
     eachEventJustOneDay,
     eachEventJustOneModerator,
-    eachModeratorAdecuateEvents,
+    relateDWithEDandEM,
+    eachModeratorAdecuateDays,
     true,!.
 writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
 

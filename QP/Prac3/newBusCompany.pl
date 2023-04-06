@@ -5,12 +5,14 @@ symbolicOutput(0).  % set to 1 for DEBUGGING: to see symbolic output only; 0 oth
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% A bus company operates services between a set of different cities.
 %% We want to design the routes of the buses for a given week.
-%% Every day a bus does exactly one traject (according to the trajects
-%% given in the input) from one city to another one, and departs from
-%% there for the next traject the next day. Each traject takes place
-%% at most once per day, and at least a given minimal amount of days
-%% per week.  No bus can travel more than a total of a given amount of
-%% kms on two consecutive days.
+%% - Every day a bus does exactly one traject (according to the trajects
+%%   given in the input)
+%% - From one city to another one, and departs from there for the next
+%%   traject the next day.
+%% - Each traject takes place at most once per day
+%% - At least a given minimal amount of days per week.
+%% - No bus can travel more than a total of a given amount of kms on two 
+%%   consecutive days.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -63,6 +65,7 @@ trip(C1-C2):-               traject(C1,C2,_,_).
 dist(C1-C2,Dist):-          traject(C1,C2,_,Dist).
 frequency(C1-C2,F):-        traject(C1,C2,F,_).
 tooLongDist(C1-C2-C3):-     trip(C1-C2), trip(C2-C3), C1 \= C3, dist(C1-C2,D1), dist(C2-C3,D2), maxDistance(Max), D1+D2 > Max.
+cities(L):-                 traject(X,Y,_,_), L = [X,Y].
 
 %%%%%%% End helpful definitions ===============================================================
 
@@ -75,16 +78,61 @@ satVariable( bdcc(B,D,C1,C2) ):- bus(B), day(D), trip(C1-C2).  % bus B on day D 
 
 %%%%%%%  2. Clause generation for the SAT solver: =============================================
 
+exactlyOneTripPerBusAndDay:- 
+    day(D),
+    bus(B),
+    findall(bdcc(B,D,C1,C2),(trip(C1-C2)),Lits),
+    exactly(1,Lits),
+    fail.
+    exactlyOneTripPerBusAndDay.
+    
+eachTripAtLeastXDays:-
+    frequency(C1-C2,F),
+    findall(bdcc(B,D,C1,C2),(bus(B),day(D)),Lits),
+    atLeast(F,Lits),
+    fail.
+eachTripAtLeastXDays.
+
+departsLastCity:-
+    bus(B),
+    day(D), D \= 1,
+    LastD is D - 1,
+    trip(C1-C2), trip(C3-C4),
+    C3 \= C2,
+    writeOneClause([-bdcc(B,LastD,C1,C2),-bdcc(B,D,C3,C4)]),
+    fail.
+departsLastCity.
+
+everyTrajectIsUniqueInADay:-
+    day(D),
+    trip(C1-C2),
+    findall(bdcc(B,D,C1,C2),(bus(B)),Lits),
+    atMost(1,Lits),
+    fail.
+everyTrajectIsUniqueInADay.
+
+kmInTwoConsecutiveDays:-
+    consecutiveDays(D1,D2),
+    tooLongDist(C1-C2-C3),
+    bus(B),
+    writeOneClause([-bdcc(B,D1,C1,C2),-bdcc(B,D2,C2,C3)]),
+    fail.
+kmInTwoConsecutiveDays.
+
+
 writeClauses:-  
     exactlyOneTripPerBusAndDay,
-    ...
+    eachTripAtLeastXDays,
+    departsLastCity,
+    everyTrajectIsUniqueInADay,
+    kmInTwoConsecutiveDays,
     true,!.
 writeClauses:- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
-exactlyOneTripPerBusAndDay:- ...
-exactlyOneTripPerBusAndDay.
 
-...
+
+
+
 
 
 %%%%%%%  3. DisplaySol: show the solution. Here M contains the literals that are true in the model:
@@ -164,7 +212,7 @@ main:-  initClauseGeneration,
         write('Generated '), write(C), write(' clauses over '), write(N), write(' variables. '),nl,
         shell('cat header clauses > infile.cnf',_),
         write('Calling solver....'), nl,
-        shell('kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
+        shell('./kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
         treatResult(Result),!.
 
 treatResult(20):- write('Unsatisfiable'), nl, halt.

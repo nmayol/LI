@@ -1,7 +1,7 @@
 #file = miSudoku
 #file = teams
-file = events
-#file = newBusCompany
+#file = events
+file = newBusCompany
 
 $(file): $(file).pl
 	swipl -q -O -g main --stand_alone=true -o $(file) -c $(file).pl

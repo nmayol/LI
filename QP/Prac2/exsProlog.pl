@@ -501,3 +501,4 @@ allSSSS(L):-
     isPerfectSquare(Sum), 
     % nl, nl, nl,
     write(Sum-SS),nl, fail.
+
