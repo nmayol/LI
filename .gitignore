@@ -21,3 +21,8 @@ QP/Prac1/kissat-master
 */*/model
 */*/header
 */*/*.cnf
+
+*/*/*/clauses
+*/*/*/model
+*/*/*/header
+*/*/*/*.cnf
