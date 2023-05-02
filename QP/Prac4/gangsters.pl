@@ -63,23 +63,77 @@ gangster(G):-      gangsters(L), member(G,L).
 hour(H):-          between(1,72,H).
 blocked(G,H):-     notAvailable(G,L), member(H,L).
 available(G,H):-   hour(H), gangster(G), \+blocked(G,H).
+consecutiveHours(H,H1):-  hour(H), hour(H1), H1 is H+1.
 
 %%%%%%% End helpful definitions ===============================================================
 
 
 %%%%%%%  1. Declare SAT variables to be used: =================================================
 
-satVariable( does(G,T,H) ):- ...  %  means:  "gangster G does task T at hour H"     (MANDATORY)
-
+satVariable( does(G,T,H) ):- gangster(G), task(T), hour(H).  %  means:  "gangster G does task T at hour H"     (MANDATORY)
+satVariable( worksCH(G,H1,H2) ):- gangster(G), hour(H1), hour(H2).
 
 %%%%%%%  2. Clause generation for the SAT solver: =============================================
+
+eveyHourCovered:-
+    hour(H),
+    task(T),
+    findall(does(G,T,H),gangster(G),Lits),
+    needed(T,H,N),
+    exactly(N,Lits),
+    fail.
+eveyHourCovered.
+
+everyGangsterOneTaskHour:-
+    gangster(G),
+    hour(H),
+    findall(does(G,T,H),task(T),Lits),
+    atMost(1,Lits),
+    fail.
+everyGangsterOneTaskHour.
+
+noDifferentTaskConsecutiveHour:-
+    gangster(G), hour(H),
+    consecutiveHours(H,H1),
+    task(T1), task(T2), T1 \= T2,
+    writeOneClause([-does(G,T1,H),-does(G,T2,H1)]),
+    fail.
+noDifferentTaskConsecutiveHour.
+
+blockAvailableHours:-
+    gangster(G), hour(H),
+    not(available(G,H)),
+    task(T),
+    writeOneClause([-does(G,T,H)]),
+    fail.
+blockAvailableHours.
+
+relate:-
+    gangster(G), hour(H), consecutiveHours(H,H1), task(T),
+    writeOneClause([-does(G,T,H),-does(G,T,H1),worksCH(G,H,H1)]),
+    fail.
+relate.
+
+lessConsecutiveHours(MaxConsecutiveHours):-
+    gangster(G),
+    findall(worksCH(G,H,H1),(hour(H), hour(H1), consecutiveHours(H,H1)),Lits),
+    atMost(MaxConsecutiveHours,Lits),
+    fail.
+lessConsecutiveHours(_).
+
+
 
 % This predicate writeClauses(MaxCost) generates the clauses that guarantee that
 % a solution with cost at most MaxCost is found
 
 writeClauses(infinite):- !, writeClauses(72),!.
 writeClauses(MaxConsecutiveHours):-
-    ...
+    eveyHourCovered,
+    everyGangsterOneTaskHour,
+    noDifferentTaskConsecutiveHour,
+    blockAvailableHours,
+    relate,
+    lessConsecutiveHours(MaxConsecutiveHours),
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
@@ -101,7 +155,11 @@ writeIfBusy(_,_,_):- write('-'),!.
 %%%%%%%  4. This predicate computes the cost of a given solution M: ===========================
 
 % Here the sort predicate is used to remove repeated elements of the list:
-costOfThisSolution(M,Cost):- ...
+costOfThisSolution(M,Cost):-
+        gangster(G), 
+        findall(consecutiveHours(H,H1),member(worksCH(G,H,H1), M), L),
+        sort(L,L1),
+        length(L1,Cost),!.
 
 
 %%%%%% ========================================================================================
@@ -172,7 +230,7 @@ main:-
         write('Generated '), write(C), write(' clauses over '), write(N), write(' variables. '),nl,
         shell('cat header clauses > infile.cnf',_),
         write('Launching kissat...'), nl,
-        shell('kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
+        shell('./kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
         treatResult(Result,[]),!.
 
 treatResult(20,[]       ):- write('No solution exists.'), nl, halt.
@@ -192,7 +250,7 @@ treatResult(10,_):- %   shell('cat model',_),
         write('Generated '), write(C), write(' clauses over '), write(N), write(' variables. '),nl,
         shell('cat header clauses > infile.cnf',_),
         write('Launching kissat...'), nl,
-        shell('kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
+        shell('./kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
         treatResult(Result,M),!.
 treatResult(_,_):- write('cnf input error. Wrote something strange in your cnf?'), nl,nl, halt.
 
