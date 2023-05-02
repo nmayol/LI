@@ -110,18 +110,66 @@ posWatchesVillage(V,I,J):- position(I,J), colVillage(V,J).            %         
 
 %%%%%%%  1. Declare SAT variables to be used: =================================================
 
-satVariable( towerPos(I,J) ):- row(I), col(J).  % means "there is a tower at position I-J"
+satVariable( towerPos(I,J)   ):-        row(I), col(J).  % means "there is a tower at position I-J"
+satVariable( towerVillage(V) ):-        village(V).
+
    % YOU MAY WANT TO INTRODUCE SOME OTHER VARIABLE FOR MAKING THE CARDINALITY CONSTRAINTS SMALLER
 
 
 %%%%%%%  2. Clause generation for the SAT solver: =============================================
 
+significantVillageHasTower:-
+    significantVillage(V),
+    findall(towerPos(I,J), posVillage(V,I,J), Lits),
+    atLeast(1,Lits),
+    fail.
+significantVillageHasTower.
+
+% - At most one tower per village
+atMostOneTowerXVillage:-
+    village(V),
+    findall(towerPos(I,J), posVillage(V,I,J), Lits),
+    atMost(1,Lits),
+    fail.
+atMostOneTowerXVillage.
+
+atLeastOneTowerWatchesCity:-
+    village(V),
+    findall(towerPos(I,J),posWatchesVillage(V,I,J),Lits),
+    atLeast(1,Lits),
+    fail.
+atLeastOneTowerWatchesCity.
+
+atMostKTowers(MaxNumTowers):-
+    findall(towerVillage(V),village(V),Lits),
+    atMost(MaxNumTowers,Lits),
+    fail.
+atMostKTowers(_).
+
+relate:-
+    village(V),
+    posVillage(V,I,J),
+    writeOneClause([-towerPos(I,J),towerVillage(V)]),
+    fail.
+relate.
+
+everyTowerInAVillage:-
+    position(I,J),
+    not(posVillage(_,I,J)),
+    writeOneClause([-towerPos(I,J)]),
+    fail.
+everyTowerInAVillage.
+
 % This predicate writeClauses(MaxCost) generates the clauses that guarantee that
 % a solution with cost at most MaxCost is found
-
 writeClauses(infinite):- !, upperLimitTowers(N), writeClauses(N),!.
 writeClauses(MaxNumTowers):-
-    ...
+    atMostOneTowerXVillage,
+    atLeastOneTowerWatchesCity,
+    significantVillageHasTower,
+    everyTowerInAVillage,
+    atMostKTowers(MaxNumTowers),
+    relate,
     true,!.                    % this way you can comment out ANY previous line of writeClauses
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 
@@ -141,8 +189,10 @@ write2(N):- write(N),!.
 
 %%%%%%%  4. This predicate computes the cost of a given solution M: ===========================
 
-costOfThisSolution(M,Cost):- ...
-
+costOfThisSolution(M,Cost):- 
+        findall(village(V), member(towerVillage(V), M), L),
+        sort(L,L1),
+        length(L1,Cost),!.
 
 %%%%%% ========================================================================================
 
@@ -212,7 +262,7 @@ main:-
         write('Generated '), write(C), write(' clauses over '), write(N), write(' variables. '),nl,
         shell('cat header clauses > infile.cnf',_),
         write('Launching kissat...'), nl,
-        shell('kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
+        shell('./kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
         treatResult(Result,[]),!.
 
 treatResult(20,[]       ):- write('No solution exists.'), nl, halt.
@@ -232,7 +282,7 @@ treatResult(10,_):- %   shell('cat model',_),
         write('Generated '), write(C), write(' clauses over '), write(N), write(' variables. '),nl,
         shell('cat header clauses > infile.cnf',_),
         write('Launching kissat...'), nl,
-        shell('kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
+        shell('./kissat -v infile.cnf > model', Result),  % if sat: Result=10; if unsat: Result=20.
         treatResult(Result,M),!.
 treatResult(_,_):- write('cnf input error. Wrote something strange in your cnf?'), nl,nl, halt.
 
