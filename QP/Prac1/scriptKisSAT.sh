@@ -15,7 +15,7 @@ show_elapsed_time() {
 }
 
 for f in vars*.cnf
-#for f in vars-300*.cnf
+#for f in vars-300-*.cnf
 do
     echo
     echo "------------------"

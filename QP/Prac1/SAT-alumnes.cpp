@@ -12,23 +12,16 @@ uint numVars;
 uint numClauses;
 vector<vector<int> > clauses;
 vector<vector<int> > occurlist;
-          //lit,    freq conflict
-vector<pair<int,pair<int,int>>> freq;
-vector<int> conflict_count;
+vector<int> freq;
+vector<int> conflicts;
+int decision = 0;
 vector<int> model;
 vector<int> modelStack;
 uint indexOfNextLitToPropagate;
 uint decisionLevel;
 
-bool sortFreqConflict(const pair<int,pair<int,int>> &a, const pair<int,pair<int,int>> &b) {
-  return (a.second.first > b.second.first);
-}
 
-bool sortLit(const pair<int,pair<int,int>> &a, const pair<int,pair<int,int>> &b) {
-  return (a.first < b.second.first);
-}
-
-void readClauses( ){
+void readClauses( ) {
   // Skip comments
   char c = cin.get();
   while (c == 'c') {
@@ -39,42 +32,41 @@ void readClauses( ){
   string aux;
   cin >> aux >> numVars >> numClauses;
   clauses.resize(numClauses);
-  conflict_count.resize(numVars+1);
   occurlist.resize(numVars+1); 
-  //freq.resize(numVars+1); 
-  
-  freq = vector<pair<int, pair<int,int>>> (numVars+1, std::make_pair(0, std::make_pair(0,0)));
+  freq.resize(numVars+1,0);
+  conflicts.resize(numVars+1,0);
+  // for (uint j = 0; j < freq.size(); ++j) cout << freq[j] << ' ';
   // Read clauses
   for (uint i = 0; i < numClauses; ++i) {
     int lit;
+    
     while (cin >> lit and lit != 0) {
         clauses[i].push_back(lit);
         if (lit > 0) {
           occurlist[lit].push_back(i);
-          ++freq[lit].second.first;
-          freq[lit].first = lit;
-        } 
+          ++freq[lit];
+        }
         else {
           occurlist[-lit].push_back(i);
-          ++freq[-lit].second.first;
-          freq[-lit].first = -lit;
+          ++freq[-lit];
         }
         
     }
+
     
   }
-  /*
-  for (uint i = 1; i < numVars; ++i) {
-    cout << i << ':' << endl;
-    for (uint j = 0; j < occurlist[i].size(); ++j) cout << occurlist[i][j] << ' ';
-    cout << endl;
-  }
-  */
+  // cout << "Conflicts: "  << endl;
+  // for (uint j = 0; j < conflicts.size(); ++j) cout << conflicts[j] << ' ';
+  // cout << endl;
+
+  // cout << "Occurlist: "  << endl;
+  // for (int i = 0; i < occurlist.size();++i) {
+  //   for (int j = 0; j < occurlist[i].size(); ++j) cout << occurlist[i][j] << ' ';
+  //   cout << endl;
+  // }  
   
-  sort(freq.begin(), freq.end(), sortFreqConflict);
-  // for (int i = 0; i < freq.size(); ++i) {
-  //    cout << freq[i].first << ' ' << freq[i].second << endl;
-  // }
+  
+  
 }
 
 
@@ -94,37 +86,52 @@ void setLiteralToTrue(int lit){
 }
 
 
-bool propagateGivesConflict ( ) {
+bool propagateGivesConflict () {
+  // cout << "aaaaaaaaaaa" << endl; 
   while ( indexOfNextLitToPropagate < modelStack.size() ) {
-      
+    
+    //for (int i = 0; i < modelStack.size(); ++i )  cout << modelStack[indexOfNextLitToPropagate] << ' ';
+    //cout << endl;       
     ////////// MEU //////////
+
     int x = modelStack[indexOfNextLitToPropagate];
+    
     if (x < 0) x = -x;
-    for (uint i = 0; i < occurlist[x].size(); ++i) {
+    //cout << "clausula lit2prop" << endl;
+    vector<int> clause = occurlist[x];
+    //for (uint j = 0; j < clause.size(); ++j) cout << clause[j] << ' ';
+    //cout << endl;
+    for (uint i = 0; i < clause.size(); ++i) {
         bool someLitTrue = false;             // de moment no podem dir que la clausula sigui certa
         int numUndefs = 0;                    // UNDEF = variables amb valors sense assignar
         int lastLitUndef = 0;                 // valor de l'ultim literal sense cap valor assignat
-        for (uint k = 0; not someLitTrue and k < clauses[occurlist[x][i]].size(); ++k){ // anem recorrent totes les clausules on apareix el literal
-            int val = currentValueInModel(clauses[occurlist[x][i]][k]);   // 
-            if (val == TRUE) { someLitTrue = true; }
-            else if (val == UNDEF){ ++numUndefs; lastLitUndef = clauses[occurlist[x][i]][k]; }
-        }
-        if (not someLitTrue and numUndefs == 0) {
-          for(uint j = 0; j < clauses[occurlist[x][i]].size(); ++j) {
-            int y = clauses[occurlist[x][i]][j];
-            // cout << y << ' ';
-            
-            if (y < 0) y = -y;
-            //sort(freq.begin(), freq.end(), sortLit);
-            //++freq[y].second.second;
-            //sort(freq.begin(), freq.end(), sortFreqConflict);
+        
+        for (uint k = 0; not someLitTrue and k < clauses[clause[i]].size(); ++k){ // anem recorrent totes les clausules on apareix el literal
+          int val = currentValueInModel(clauses[clause[i]][k]);   // 
+          // cout << clauses[occurlist[x][i]][k] << endl;
+          if (val == TRUE) {
+              someLitTrue = true;
           }
+          else if (val == UNDEF){ ++numUndefs; lastLitUndef = clauses[clause[i]][k]; }
+          // else {
+          //   ++conflicts[clauses[clause[i]][k]];
+          // }
+        }
+        if (not someLitTrue and numUndefs == 0) { 
+          // for (uint k = 0; k < clauses[clause[i]].size(); ++k) 
+          //   cout << clauses[clause[i]][k] << ' ';
           // cout << endl;
+
+          for (uint k = 0; k < clauses[clause[i]].size(); ++k) {
+            ++conflicts[abs(clauses[clause[i]][k])];
+          }
           return true; // conflict! all lits false
+          
         }
         else if (not someLitTrue and numUndefs == 1) setLiteralToTrue(lastLitUndef);	
 
     }
+    
     
     /////////////////////////
 
@@ -142,9 +149,11 @@ bool propagateGivesConflict ( ) {
       else if (not someLitTrue and numUndefs == 1) setLiteralToTrue(lastLitUndef);	
     }    
     */
-   ++indexOfNextLitToPropagate;
+   
    //cout << endl;
+   ++indexOfNextLitToPropagate;
   }
+  //cout << "bbbbbbbbbbb" << endl;
   return false;
 }
 
@@ -167,16 +176,25 @@ void backtrack(){
 
 
 // Heuristic for finding the next decision literal:
-// Agafant el UNDEF que té més ocurrencies ???
+// Agafant el que té més ocurrencies ???
 int getNextDecisionLiteral(){
-  
-  bool found = false;
-  int x = 0;
-  for (uint i = 1; not found and i <= freq.size(); ++i) {
-    found = (model[freq[i].first] == UNDEF);
-    if (found) x = freq[i].first;
+  ++decision;
+  if (decision % 100 == 0) {
+    for (int i = 0; i < conflicts.size(); ++i) conflicts[i] /= 2;
+    decision = 1;
   }
-  return x; // returns 0 when all literals are defined
+  
+  
+  int max = -1;
+  int freqmax = 0;
+  int imax = 0;
+  for (uint i = 1; i <= numVars; ++i) // stupid heuristic:
+    if (model[i] == UNDEF && (conflicts[i] > max || (conflicts[i] == max && freqmax < freq[i]))) {
+      freqmax = freq[i];
+      max = conflicts[i];
+      imax = i;
+    } 
+  return imax; // reurns 0 when all literals are defined
 }
 
 void checkmodel(){
@@ -203,17 +221,21 @@ int main(){
   for (uint i = 0; i < numClauses; ++i)
     if (clauses[i].size() == 1) {
       int lit = clauses[i][0];
+      
       int val = currentValueInModel(lit);
+      
       if (val == FALSE) {cout << "UNSATISFIABLE" << endl; return 10;}
       else if (val == UNDEF) setLiteralToTrue(lit);
     }
   
   // DPLL algorithm
   while (true) {
+    
     while ( propagateGivesConflict() ) {
       if ( decisionLevel == 0) { cout << "UNSATISFIABLE" << endl; return 10; }
       backtrack();
     }
+    
     int decisionLit = getNextDecisionLiteral();
     if (decisionLit == 0) { checkmodel(); cout << "SATISFIABLE" << endl; return 20; }
     // start new decision level:
