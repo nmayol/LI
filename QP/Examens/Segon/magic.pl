@@ -19,14 +19,20 @@ main:- p(5), nl, halt.
 p(N):-
     NSquare is N*N,
     length( Vars, NSquare ),
-    ...
+    Vars ins 1..NSquare,
+    all_different(Vars),
     squareByRows(N,Vars,SquareByRows),
     transpose( SquareByRows, SquareByCols ),  % transpose already exists: no need to implement it
     Sum is (N + N*N*N) // 2,
     constraintsSum( Sum, SquareByRows),
-    ...
+    constraintsSum( Sum, SquareByCols),
+    labeling([ff], Vars),
     writeSquare(SquareByRows),nl,!.
 
+constraintsSum( _, []).
+constraintsSum( Sum, [S|SquareByRows]):-
+    sum(S, #=, Sum),
+    constraintsSum(Sum,SquareByRows).
 
 squareByRows(_,[],[]):-!.
 squareByRows(N,Vars,[Row|SquareByRows]):- append(Row,Vars1,Vars), length(Row,N), squareByRows(N,Vars1,SquareByRows),!.
