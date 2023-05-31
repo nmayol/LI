@@ -117,31 +117,75 @@ writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
 eachCourseExactlyOneProf:- courseProfessors(C,LP), findall( cp(C,P), member(P,LP), Lits ), exactly(1,Lits), fail.
 eachCourseExactlyOneProf.
 
-eachCourseExactlyOneRoom:- ...
+eachCourseExactlyOneRoom:-
+    course(C),
+    findall(cr(C,R),(courseRooms(C,LR),member(R,LR)),Lits),
+    exactly(1,Lits),fail.
 eachCourseExactlyOneRoom.
 
-eachCourseMaxOncePerDay:-  ...
+eachCourseMaxOncePerDay:- 
+    course(C),
+    day(D),
+    findall(cdh(C,D,H),hour(H),Lits),
+    atMost(1,Lits),
+    fail.
 eachCourseMaxOncePerDay.
 
-relateVarsCDHwithCD:-      ...    expressOr(cd(C,D),Lits), fail.
+relateVarsCDHwithCD:- 
+    day(D),
+    course(C),
+    findall(cdh(C,D,H),hour(H),Lits),     
+    expressOr(cd(C,D),Lits), fail.
 relateVarsCDHwithCD.
 
-eachCourseRightNumberOfDays:- ...
+eachCourseRightNumberOfDays:-
+    course(C),
+    courseHours(C,Hs),
+    findall(cd(C,D),day(D),Lits),
+    exactly(Hs,Lits),
+    fail.
 eachCourseRightNumberOfDays.
 
-noOverlapCoursesSameYear:- ...
+noOverlapCoursesSameYear:-
+    year(Y),
+    day(D), hour(H),
+    findall(cdh(C,D,H),(courseYear(Cs,Y),member(C,Cs)),Lits),
+    atMost(1,Lits),
+    fail.
 noOverlapCoursesSameYear.
 
-noOverlapProfs:- ...       writeClause([ -cdh(C1,D,H), -cdh(C2,D,H), -cp(C1,P), -cp(C2,P) ]), fail. 
+noOverlapProfs:-
+    day(D),
+    hour(H),
+    course(C1),
+    course(C2),
+    C1 \= C2,
+    professor(P),
+    courseProfessors(C1,Ps1), courseProfessors(C2,Ps2),
+    member(P,Ps1),
+    member(P,Ps2),
+    writeClause([ -cdh(C1,D,H), -cdh(C2,D,H), -cp(C1,P), -cp(C2,P) ]), fail. 
 noOverlapProfs.
 
-noOverlapRooms:- ...
+noOverlapRooms:-
+    day(D),
+    hour(H),
+    course(C1),
+    course(C2),
+    C1 \= C2,
+    room(R),
+    writeClause([ -cdh(C1,D,H), -cdh(C2,D,H), -cr(C1,R), -cr(C2,R) ]), fail.
 noOverlapRooms.
 
-relateVarsCPwithUsedProf:- ...
+relateVarsCPwithUsedProf:-
+    course(C), professor(P),
+    writeClause([-cp(C,P),usedProf(P)]),
+    fail.
 relateVarsCPwithUsedProf.
 
-maxProfs(MaxNumProf):- ...
+maxProfs(MaxNumProf):-
+    findall(usedProf(P),professor(P),Lits),
+    atMost(MaxNumProf,Lits).
 maxProfs(_).
 
 
