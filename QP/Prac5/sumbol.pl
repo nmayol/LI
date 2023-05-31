@@ -17,7 +17,7 @@ instrucciones(Insts):-
 instrucciones(Insts):-
     append(['if'|Inst],['endif',';'|I],Insts), instruccion(Inst), instrucciones(I).
 instrucciones(Insts):-
-    append(['if'|Inst],['endif'],Insts), instruccion(Inst), instrucciones(I).
+    append(['if'|Inst],['endif'],Insts), instruccion(Inst), instrucciones(Insts).
 
 instruccion([A,'=',B,'+',C]):-
     v(A), v(B), v(C).
