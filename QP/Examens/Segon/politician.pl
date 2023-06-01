@@ -24,16 +24,27 @@ road( 7-8, 44 ).
 road1(A-B,K):- road(A-B,K).
 road1(B-A,K):- road(A-B,K).
 
+% genera una llista amb valors de 1 a N
+% generate_list(1, [1]).
+% generate_list(N, List) :-
+%   N > 1,
+%   N1 is N - 1,
+%   generate_list(N1, List1),
+%   append(List1, [N], List).
 
-politician(N,MaxKm,Trip):-     path(...).
+politician(N, MaxKm, Trip) :-
+    path(N, MaxKm, 1, [], Trip).
 
 % path( NumCitiesRemainingToBeVisited, RemainingKm, CurrentCity, CitiesAlreadyVisited, Path )
 
-path( 0, RemainingKm, 1, _, [] ):- ..., !.
-path( NumCitiesRemainingToBeVisited, RemainingKm, CurrentCity, CitiesAlreadyVisited, [CurrentCity1|Path] ):-
-    road1( CurrentCity-CurrentCity1, K ),
-    ...
-    path( ... ).
+% path(NumCitiesRemainingToBeVisited, RemainingKm, CurrentCity, CitiesAlreadyVisited, Path)
+path(0, RemainingKm, 1, _, []) :- RemainingKm >= 0,!.
+path(NumCitiesRemainingToBeVisited, RemainingKm, CurrentCity, CitiesAlreadyVisited, [CurrentCity1 | Path]) :-
+    road1(CurrentCity-CurrentCity1, K),
+    not(member(CurrentCity1, CitiesAlreadyVisited)),
+    N1 is NumCitiesRemainingToBeVisited - 1,
+    RDist is RemainingKm - K,
+    path(N1, RDist, CurrentCity1, [CurrentCity1 | CitiesAlreadyVisited], Path).
 
 
 %% Examples: this main writes the six trips below (in some order):
