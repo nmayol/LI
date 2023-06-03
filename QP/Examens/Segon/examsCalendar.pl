@@ -108,9 +108,7 @@ definitionExamOnDay.
 nobodyWithThreeExamsOnSameDay :-
     subject(S1), subject(S2), subject(S3), S1 \= S2, S2 \= S3, S1 \= S3, shareSomeStudent(S1, S2, S3),
     day(D),
-    writeClause([-x(S1,D),-x(S2,D)]),
-    writeClause([-x(S1,D),-x(S3,D)]),
-    writeClause([-x(S2,D),-x(S3,D)]),
+    writeClause([-x(S1,D),-x(S2,D),-x(S3,D)]),
     fail.
 nobodyWithThreeExamsOnSameDay.
 
@@ -164,7 +162,7 @@ costOfThisSolution(M, Cost):-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % No need to modify anything below this line:
 
-main:-  symbolicOutput(0), !, writeClauses(infinite), halt.   % print the clauses in symbolic form and halt
+main:-  symbolicOutput(1), !, writeClauses(infinite), halt.   % print the clauses in symbolic form and halt
 main:-
     told, write('Looking for initial solution with arbitrary cost...'), nl,
     initClauseGeneration,
