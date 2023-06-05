@@ -139,6 +139,26 @@ ord(L1,L2):- permutation(L1,L2), esta_ordenada(L2).
 % el alfabeto A dado). Por ejemplo, diccionario( [ga,chu,le],2) escribiria:
 %     gaga gachu gale chuga chuchu chule lega lechu lele.
 
+bigList(_,0,BA):-!.
+bigList(A,N,BA):-
+    N1 is N - 1,
+    bigList(A,N1,[A,BA]).
+
+diccionario(_,0).
+diccionario(A,N):-
+    Res = [],
+    bigList(A,N,BA),
+    write(BA),
+    subcjt(BA,SubBA),
+    length(SubBA,N),
+    append(Res,SubBA,Res), fail,
+    write(Res).
+
+    
+
+
+
+
 %%%%%%%% EXERCICI 13 %%%%%%%%
 % Escribe un predicado palindromos(L) que, dada una lista de letras L, escriba todas las 
 % permutaciones de sus elementos que sean palindromos (capicuas). Por ejemplo, con la consulta
@@ -253,12 +273,54 @@ ok([_]):-!,nl.
 p2([],[]).
 p2(L,[X|P]) :- select(X,L,R), p2(R,P).
 
+%%%%%%%% EXERCICI 17 %%%%%%%%
+% Complete the following backtracking procedure for SAT in Prolog. Program everything, except
+% the predicate readclauses(F), which reads a list of clauses, where each clause is a list of integers.
+% For example, p3 ∨ ¬p6 ∨ p2 is represented by [3,-6,2]. Do things as simple as possible.
+
+
+% unit clause selection
+decision_lit(F, Lit) :-
+    member(Clause, F),
+    length(Clause, Len),
+    (   Len =:= 1 ->
+        member(Lit, Clause)
+    ;   true
+    ).
+
+% simplify formula F by assigning value to Lit
+simplify_lit(Lit, F, F1) :-
+    select(Clause, F, Rest),
+    (   member(Lit, Clause) -> % Literal in clause
+        F1 = Rest % Clause is true, remove it from formula
+    ;   select(-Lit, Clause, Clause1) -> % Negation of literal in clause
+        (   Clause1 = [] -> % Clause is false, return failure
+            fail
+        ;   F1 = [Clause1|Rest] % Remove literal from clause
+        )
+    ;   F1 = [Clause|Rest] % Literal not in clause, leave clause in formula
+    ).
+
+% empty formula is always satisfiable
+sat(I,[]) :-
+    write('IT IS SATISFIABLE. Model: '), write(I), nl, !.
+
+% recursive call for formula F
+sat(I,F) :-
+    decision_lit(F, Lit),
+    simplify_lit(Lit, F, F1),
+    sat([Lit|I], F1).
+
+
 %%%%%%%% EXERCICI 19 %%%%%%%%
 % Supongamos que tenemos una maquina que dispone de monedas de valores [X1,...Xn] y tiene
 % que devolver una cantidad C de cambio utilizando el minimo numero de monedas. Escribe un
 % programa Prolog maq(L,C,M) que, dada la lista de monedas L y la cantidad C, genere en M la
 % lista de monedas a devolver de cada tipo. Por ejemplo, si L es [1,2,5,13,17,35,157], y C es
 % 361, entonces una respuesta es [0,0,0,1,2,0,2] (5 monedas).
+
+
+
 
 
 
@@ -383,7 +445,7 @@ sumList([X|L],S):-
 %% and if we try to add any other element, the sum exceeds K.
 maxSubset(K, L, Sm):-
     subsetWithRest(L, Sm, Rest),
-   
+    
     sumList(Sm,SUM),
     K >= SUM,
     addElement(Rest,SUM,K),
@@ -426,7 +488,7 @@ edge1(4,9).
 edge1(9,5).
 edge1(4,5).
 %%==========================================================
-main:- vertices(Vs), subcjt( Vs, S), minCliqueSize(N), length(S,NS), N =< NS, isClique(S), write(S), nl, fail.
+main:- vertices(Vs), subcjt( Vs, S), minCliqueSize(N), length(S,NS), N =< NS, isClique(S), once(write(S)), nl, fail.
 main:- halt.
 
 isClique([]).
@@ -500,5 +562,5 @@ allSSSS(L):-
     % write(SS), write(' '), write(Sum), write(': '),
     isPerfectSquare(Sum), 
     % nl, nl, nl,
-    write(Sum-SS),nl, fail.
+    write(Sum-SS), nl, fail.
 
