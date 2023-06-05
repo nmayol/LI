@@ -24,4 +24,10 @@ QP/Prac1/kissat-master
 */*/header
 */*/*.cnf
 */*/*/*/clauses
+*/*/*/clauses
+*/*/*/model
+*/*/*/header
+*/*/*/*.cnf
+*/*/*/*/*/clauses
+QP/EntregaParcial
 QP/EntregaParcial.zip
