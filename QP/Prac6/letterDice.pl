@@ -24,103 +24,61 @@ word([w, r, a, p]).
 num(X, N) :- nth1(N, [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, r, s, t, u, v, w, x, y], X).
 
 p:-
-    length(D1, 6),
-    length(D2, 6),
-    length(D3, 6),
-    length(D4, 6),
+    length(D1, 6), length(D2, 6), length(D3, 6), length(D4, 6),
 
-    D1 ins 0..23,
-    D2 ins 0..23,
-    D3 ins 0..23,
-    D4 ins 0..23,
+    flatten([D1,D2,D3,D4],Vars),
+    Vars ins 1..24,
+    all_distinct(Vars),
 
-    look4Words(D1, D2, D3, D4),
+    findall(W, word(W), Words),
+    dicesHaveAllWords(Words, D1, D2, D3, D4),   
 
-    write('D1'), writeN(D1), nl,
-    write('D2'), writeN(D2), nl,
-    write('D3'), writeN(D3), nl,
-    write('D4'), writeN(D4), nl,
+    labeling([ff],Vars),
+    write('D1: '), writeN(D1), nl,
+    write('D2: '), writeN(D2), nl,
+    write('D3: '), writeN(D3), nl,
+    write('D4: '), writeN(D4), nl,
     halt.
 
-writeN(D) :- findall(X, (member(N, D), num(X, N)), L), write(L), nl, !.
+writeN(D):- findall(X,(member(N,D),num(X,N)),L), write(L), nl, !.
 
-look4Words(D1, D2, D3, D4) :-
-    word(W),
-    declareConstraints(W, D1, D2, D3, D4).
+dicesHaveAllWords([], _, _, _, _).
+dicesHaveAllWords([W|Words], D1, D2, D3, D4) :-
+    diceHasWord(W, D1, D2, D3, D4),
+    
+    dicesHaveAllWords(Words, D1, D2, D3, D4).
 
+diceHasWord([A, B, C, D], D1, D2, D3, D4) :-
+    num(A, AN), num(B, BN), num(C, CN), num(D, DN),
+    
+    lettersDifferentDices(AN, BN, CN, DN, D1, D2, D3, D4),!.
 
-declareConstraints(W, D1, D2, D3, D4) :-
-    nth0(0, W, L1),
-    num(L1, N1),
-    element(1, D1, N1),
+lettersDifferentDices(A, B, C, D, D1, D2, D3, D4) :-
+    
+    dontCoincide(A, B, C, D, D1),
+    dontCoincide(A, B, C, D, D2),
+    dontCoincide(A, B, C, D, D3),
+    dontCoincide(A, B, C, D, D4),!.
 
-    nth0(1, W, L2),
-    num(L2, N2),
-    element(1, D2, N2),
+dontCoincide(A, B, C, D, Dx) :-
+    
+    memberDice(A, Dx, ResA),  memberDice(B, Dx, ResB), memberDice(C, Dx, ResC),  memberDice(D, Dx, ResD),
+    notmemberDice(A, Dx, ResA1), notmemberDice(B, Dx, ResB1), notmemberDice(C, Dx, ResC1), notmemberDice(D, Dx, ResD1),
 
-    nth0(2, W, L3),
-    num(L3, N3),
-    element(1, D3, N3),
+    (ResA #/\ (ResB1) #/\ (ResC1) #/\ (ResD1)) #\/
+    (ResB #/\ (ResA1) #/\ (ResC1) #/\ (ResD1)) #\/
+    (ResC #/\ (ResA1) #/\ (ResB1) #/\ (ResD1)) #\/
+    (ResD #/\ (ResA1) #/\ (ResB1) #/\ (ResC1)).
 
-    nth0(3, W, L4),
-    num(L4, N4),
-    element(1, D4, N4),!.
+    
+    
+notmemberDice(N, [C1,C2,C3,C4,C5,C6], Res) :-
+    % write(N),   write(':'), nl,
+    % write('['), num(X1,C1), write(X1), write(','), num(X2,C2), write(X2), write(','), num(X3,C3), write(X3), write(','), num(X4,C4), write(X4), write(','), num(X5,C5), write(X5), write(','), num(X6,C6), write(X6), write(']'), nl,
+    Res = (N #\= C1 #/\ N #\= C2 #/\ N #\= C3 #/\ N #\= C4 #/\ N #\= C5 #/\ N #\= C6).
 
+memberDice(N, [C1,C2,C3,C4,C5,C6], Res) :-
+    %write(N),   write(':'), nl,
+    %write('['), num(X1,C1), write(X1), write(','), num(X2,C2), write(X2), write(','), num(X3,C3), write(X3), write(','), num(X4,C4), write(X4), write(','), num(X5,C5), write(X5), write(','), num(X6,C6), write(X6), write(']'), nl,
+    Res = (N #= C1 #\/ N #= C2 #\/ N #= C3 #\/ N #= C4 #\/ N #= C5 #\/ N #= C6).
 
-% 1	2	3	4
-% 		4	3
-% 	3	2	4
-% 		4	2
-% 	4	2	3
-% 		3	2
-
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D1, D2, D4, D3).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D1, D3, D2, D4).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D1, D3, D4, D2).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D1, D4, D2, D3).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D1, D4, D3, D2).
-
-
-% 2	1	3	4
-% 		4	3
-% 	3	1	4
-% 		4	1
-% 	4	1	3
-% 		3	1
-
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D2, D1, D4, D3).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D2, D3, D1, D4).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D2, D3, D4, D1).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D2, D4, D1, D3).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D2, D4, D3, D1).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D2, D1, D3, D4).
-
-
-% 3	1	2	4
-% 		4	2
-% 	2	1	4
-% 		4	1
-% 	4	1	2
-% 		2	1
-
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D3, D1, D4, D2).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D3, D2, D1, D4).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D3, D2, D4, D1).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D3, D4, D1, D2).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D3, D4, D2, D1).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D3, D1, D2, D4).
-
-
-% 4	1	2	3
-% 		3	2
-% 	2	1	3
-% 		3	1
-% 	3	1	2
-% 		2	1
-
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D4, D1, D3, D2).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D4, D2, D1, D3).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D4, D2, D3, D1).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D4, D3, D1, D2).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D4, D3, D2, D1).
-declareConstraints(W, D1, D2, D3, D4) :- declareConstraints(W, D4, D1, D2, D3).
